@@ -13,6 +13,7 @@ let canvas;
 let ctx;
 let particles = [];
 let isDrawing = false;
+let currentHue = 240;
 
 function init() {
     loginScreen = document.getElementById('login-screen');
@@ -36,6 +37,15 @@ function init() {
 
     startBtn.addEventListener('click', handleLogin);
     logoutBtn.addEventListener('click', handleLogout);
+
+    document.querySelectorAll('.color-dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            currentHue = parseInt(e.currentTarget.getAttribute('data-hue'));
+        });
+    });
 
     window.addEventListener('resize', resizeCanvas);
     setupCanvasInteractions();
@@ -74,6 +84,10 @@ function showMainScreen() {
     mainScreen.classList.remove('hidden');
     userDisplay.textContent = currentUser.name;
 
+    if (window.GameVersion) {
+        window.GameVersion.init();
+    }
+
     resizeCanvas();
     updateTimerDisplay(currentUser.totalTimeSpent);
     startTimer();
@@ -111,11 +125,16 @@ function resizeCanvas() {
 }
 
 function setupCanvasInteractions() {
-    window.addEventListener('mousedown', () => isDrawing = true);
+    window.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.hotbar')) return;
+        isDrawing = true;
+    });
     window.addEventListener('mouseup', () => isDrawing = false);
     
     window.addEventListener('mousemove', (e) => {
         if (!isDrawing) return;
+        if (e.target.closest('.hotbar')) return;
+        
         for (let i = 0; i < 3; i++) {
             particles.push({
                 x: e.clientX,
@@ -124,15 +143,20 @@ function setupCanvasInteractions() {
                 speedX: (Math.random() - 0.5) * 1.5,
                 speedY: (Math.random() - 0.5) * 1.5,
                 alpha: 1,
-                color: `hsla(${Math.random() * 60 + 240}, 80%, 70%, `
+                color: `hsla(${currentHue + (Math.random() * 30 - 15)}, 80%, 70%, `
             });
         }
     });
 
-    window.addEventListener('touchstart', () => isDrawing = true);
+    window.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.hotbar')) return;
+        isDrawing = true;
+    });
     window.addEventListener('touchend', () => isDrawing = false);
     window.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 0) return;
+        if (!isDrawing || e.touches.length === 0) return;
+        if (e.target.closest('.hotbar')) return;
+        
         let touch = e.touches[0];
         for (let i = 0; i < 3; i++) {
             particles.push({
@@ -142,7 +166,7 @@ function setupCanvasInteractions() {
                 speedX: (Math.random() - 0.5) * 1.5,
                 speedY: (Math.random() - 0.5) * 1.5,
                 alpha: 1,
-                color: `hsla(${Math.random() * 60 + 240}, 80%, 70%, `
+                color: `hsla(${currentHue + (Math.random() * 30 - 15)}, 80%, 70%, `
             });
         }
     });
