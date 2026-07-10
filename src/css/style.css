@@ -123,6 +123,32 @@ button:hover {
     font-size: 14px;
 }
 
+.color-palette {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: 4px;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.1s;
+}
+
+.color-dot:hover {
+    transform: scale(1.15);
+}
+
+.color-dot.active {
+    outline: 1px solid #fff;
+    outline-offset: 1px;
+}
+
 .logout-icon-btn {
     background: transparent;
     border: none;
@@ -143,6 +169,22 @@ button:hover {
 .logout-icon-btn:hover {
     background: #ef4444;
     color: #fff;
+}
+
+.version-tag {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #475569;
+    letter-spacing: 1px;
+    z-index: 10;
+    background: #131a26;
+    padding: 10px 14px;
+    border-radius: 0;
+    border: 1px solid #1e293b;
+    pointer-events: none;
 }
 
 #relax-canvas {
