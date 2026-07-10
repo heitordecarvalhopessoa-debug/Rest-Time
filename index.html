@@ -23,15 +23,26 @@
                 <span id="user-display" class="user-text"></span>
                 <span class="divider">·</span>
                 <span id="timer-display" class="timer-text">00:00</span>
+                <span class="divider">·</span>
+                <div class="color-palette" onclick="event.stopPropagation()">
+                    <button class="color-dot active" data-hue="240" style="background: #a374ff;"></button>
+                    <button class="color-dot" data-hue="0" style="background: #ff5555;"></button>
+                    <button class="color-dot" data-hue="120" style="background: #50fa7b;"></button>
+                    <button class="color-dot" data-hue="40" style="background: #ffb86c;"></button>
+                    <button class="color-dot" data-hue="180" style="background: #8be9fd;"></button>
+                </div>
             </div>
             <button id="logout-btn" title="Change Name" class="logout-icon-btn">&times;</button>
         </div>
+
+        <div id="version-display" class="version-tag"></div>
 
         <canvas id="relax-canvas"></canvas>
         <div class="canvas-hint">Click and drag your mouse to paint</div>
     </div>
 
     <script src="src/js/storage.js"></script>
+    <script src="src/js/version.js"></script>
     <script src="src/js/main.js"></script>
 </body>
 </html>
