@@ -33,6 +33,11 @@ declare global {
             current: string;
             init: () => void;
         };
+        StarTimeManager?: {
+            decayRate: number;
+            init: () => void;
+            updateDecay: (value: string) => void;
+        };
     }
 }
 
