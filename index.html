@@ -11,7 +11,6 @@
     <div id="login-screen" class="screen">
         <div class="card">
             <h1>Rest Time</h1>
-            <p>Take a moment to rest</p>
             <input type="text" id="username-input" placeholder="What is your name?">
             <button id="start-btn">Enter Space</button>
         </div>
@@ -23,19 +22,31 @@
                 <span id="user-display" class="user-text"></span>
                 <span class="divider">·</span>
                 <span id="timer-display" class="timer-text">00:00</span>
-                <span class="divider">·</span>
-                <div class="color-palette" onclick="event.stopPropagation()">
-                    <button class="color-dot active" data-hue="240" style="background: #a374ff;"></button>
-                    <button class="color-dot" data-hue="0" style="background: #ff5555;"></button>
-                    <button class="color-dot" data-hue="120" style="background: #50fa7b;"></button>
-                    <button class="color-dot" data-hue="40" style="background: #ffb86c;"></button>
-                    <button class="color-dot" data-hue="180" style="background: #8be9fd;"></button>
-                </div>
             </div>
             <button id="logout-btn" title="Change Name" class="logout-icon-btn">&times;</button>
         </div>
 
         <div id="version-display" class="version-tag"></div>
+
+        <div class="color-palette" onclick="event.stopPropagation()">
+            <button class="color-dot" data-color="#ef4444" style="background: #ef4444;"></button>
+            <button class="color-dot" data-color="#f59e0b" style="background: #f59e0b;"></button>
+            <button class="color-dot" data-color="#10b981" style="background: #10b981;"></button>
+            <button class="color-dot" data-color="#06b6d4" style="background: #06b6d4;"></button>
+            <button class="color-dot active" data-color="#3b82f6" style="background: #3b82f6;"></button>
+            <button class="color-dot" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
+            <button class="color-dot" data-color="#ec4899" style="background: #ec4899;"></button>
+            
+            <div class="custom-color-wrapper">
+                <input type="color" id="custom-color-picker" value="#3b82f6">
+            </div>
+
+            <div class="palette-divider"></div>
+
+            <div class="time-slider-wrapper" title="Duração das estrelas">
+                <input type="range" id="particle-lifetime-slider" min="1" max="10" value="5">
+            </div>
+        </div>
 
         <canvas id="relax-canvas"></canvas>
         <div class="canvas-hint">Click and drag your mouse to paint</div>
@@ -43,6 +54,7 @@
 
     <script src="src/js/storage.js"></script>
     <script src="src/js/version.js"></script>
+    <script src="src/js/time.js"></script>
     <script src="src/js/main.js"></script>
 </body>
 </html>
