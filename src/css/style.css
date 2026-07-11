@@ -91,84 +91,195 @@ button:hover {
 .hotbar {
     position: absolute;
     top: 24px;
-    background: #131a26;
-    padding: 10px 20px;
+    background: rgba(19, 26, 38, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 8px 16px;
     border-radius: 0;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     z-index: 10;
     border: 1px solid #1e293b;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .hotbar-group {
     display: flex;
     align-items: center;
-    font-size: 14px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
 }
 
 .user-text {
-    color: #e2e8f0;
+    color: #94a3b8;
     font-weight: 500;
 }
 
 .divider {
-    color: #1e293b;
-    margin: 0 8px;
+    color: #334155;
+    margin: 0 12px;
 }
 
 .timer-text {
     color: #3b82f6;
     font-weight: 600;
-    font-size: 14px;
 }
 
 .color-palette {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
-    gap: 6px;
+    flex-direction: column;
     align-items: center;
-    margin-left: 4px;
+    gap: 10px;
+    background: rgba(19, 26, 38, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 12px 10px;
+    border: 1px solid #1e293b;
+    z-index: 10;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .color-dot {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: none;
     cursor: pointer;
     padding: 0;
-    transition: transform 0.1s;
+    transition: opacity 0.15s, transform 0.15s;
+    opacity: 0.6;
 }
 
 .color-dot:hover {
-    transform: scale(1.15);
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 .color-dot.active {
-    outline: 1px solid #fff;
-    outline-offset: 1px;
+    opacity: 1;
+    outline: 1px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.custom-color-wrapper {
+    width: 14px;
+    height: 14px;
+    position: relative;
+}
+
+#custom-color-picker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-color-wrapper::after {
+    content: '+';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #64748b;
+    background: #0b0f19;
+    border: 1px dashed #334155;
+    pointer-events: none;
+}
+
+.custom-color-wrapper:hover::after {
+    color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.palette-divider {
+    width: 100%;
+    height: 1px;
+    background: #1e293b;
+    margin: 2px 0;
+}
+
+.time-slider-wrapper {
+    width: 14px;
+    height: 90px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+#particle-lifetime-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 82px;
+    height: 2px;
+    background: #1e293b;
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 44px;
+    cursor: pointer;
+    outline: none;
+}
+
+#particle-lifetime-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 6px;
+    height: 10px;
+    border-radius: 0;
+    background: #64748b;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#particle-lifetime-slider::-webkit-slider-thumb:hover {
+    background: #3b82f6;
+}
+
+#particle-lifetime-slider::-moz-range-thumb {
+    width: 6px;
+    height: 10px;
+    border-radius: 0;
+    background: #64748b;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+}
+
+#particle-lifetime-slider::-moz-range-thumb:hover {
+    background: #3b82f6;
 }
 
 .logout-icon-btn {
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: #64748b;
     padding: 0;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     border-radius: 0;
-    transition: all 0.2s;
-    width: 24px;
-    height: 24px;
+    transition: color 0.15s, background 0.15s;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 4px;
 }
 
 .logout-icon-btn:hover {
-    background: #ef4444;
-    color: #fff;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
 .version-tag {
@@ -176,12 +287,12 @@ button:hover {
     top: 24px;
     right: 24px;
     font-family: monospace;
-    font-size: 11px;
+    font-size: 10px;
     color: #475569;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     z-index: 10;
-    background: #131a26;
-    padding: 10px 14px;
+    background: rgba(19, 26, 38, 0.4);
+    padding: 6px 10px;
     border-radius: 0;
     border: 1px solid #1e293b;
     pointer-events: none;
@@ -200,7 +311,8 @@ button:hover {
 .canvas-hint {
     position: absolute;
     bottom: 24px;
-    color: #475569;
-    font-size: 13px;
+    color: #334155;
+    font-size: 12px;
+    letter-spacing: 0.5px;
     pointer-events: none;
 }
