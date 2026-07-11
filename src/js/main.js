@@ -13,7 +13,7 @@ let canvas;
 let ctx;
 let particles = [];
 let isDrawing = false;
-let currentHue = 240;
+let currentRGB = { r: 59, g: 130, b: 246 };
 
 function init() {
     loginScreen = document.getElementById('login-screen');
@@ -43,12 +43,28 @@ function init() {
             e.stopPropagation();
             document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
             e.currentTarget.classList.add('active');
-            currentHue = parseInt(e.currentTarget.getAttribute('data-hue'));
+            const hex = e.currentTarget.getAttribute('data-color');
+            currentRGB = hexToRgb(hex);
         });
     });
 
+    const picker = document.getElementById('custom-color-picker');
+    if (picker) {
+        picker.addEventListener('input', (e) => {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            currentRGB = hexToRgb(e.target.value);
+        });
+    }
+
     window.addEventListener('resize', resizeCanvas);
     setupCanvasInteractions();
+}
+
+function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return { r, g, b };
 }
 
 function handleLogin() {
@@ -71,12 +87,6 @@ function handleLogout() {
     showLoginScreen();
 }
 
-function showLoginScreen() {
-    mainScreen.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
-    usernameInput.value = '';
-}
-
 function showMainScreen() {
     if (!currentUser) return;
 
@@ -86,6 +96,10 @@ function showMainScreen() {
 
     if (window.GameVersion) {
         window.GameVersion.init();
+    }
+
+    if (window.StarTimeManager) {
+        window.StarTimeManager.init();
     }
 
     resizeCanvas();
@@ -126,16 +140,21 @@ function resizeCanvas() {
 
 function setupCanvasInteractions() {
     window.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.hotbar')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
         isDrawing = true;
     });
     window.addEventListener('mouseup', () => isDrawing = false);
     
     window.addEventListener('mousemove', (e) => {
         if (!isDrawing) return;
-        if (e.target.closest('.hotbar')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
         
         for (let i = 0; i < 3; i++) {
+            const variance = Math.floor(Math.random() * 40 - 20);
+            const r = Math.max(0, Math.min(255, currentRGB.r + variance));
+            const g = Math.max(0, Math.min(255, currentRGB.g + variance));
+            const b = Math.max(0, Math.min(255, currentRGB.b + variance));
+            
             particles.push({
                 x: e.clientX,
                 y: e.clientY,
@@ -143,22 +162,27 @@ function setupCanvasInteractions() {
                 speedX: (Math.random() - 0.5) * 1.5,
                 speedY: (Math.random() - 0.5) * 1.5,
                 alpha: 1,
-                color: `hsla(${currentHue + (Math.random() * 30 - 15)}, 80%, 70%, `
+                color: `rgba(${r}, ${g}, ${b}, `
             });
         }
     });
 
     window.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.hotbar')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
         isDrawing = true;
     });
     window.addEventListener('touchend', () => isDrawing = false);
     window.addEventListener('touchmove', (e) => {
         if (!isDrawing || e.touches.length === 0) return;
-        if (e.target.closest('.hotbar')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
         
         let touch = e.touches[0];
         for (let i = 0; i < 3; i++) {
+            const variance = Math.floor(Math.random() * 40 - 20);
+            const r = Math.max(0, Math.min(255, currentRGB.r + variance));
+            const g = Math.max(0, Math.min(255, currentRGB.g + variance));
+            const b = Math.max(0, Math.min(255, currentRGB.b + variance));
+
             particles.push({
                 x: touch.clientX,
                 y: touch.clientY,
@@ -166,7 +190,7 @@ function setupCanvasInteractions() {
                 speedX: (Math.random() - 0.5) * 1.5,
                 speedY: (Math.random() - 0.5) * 1.5,
                 alpha: 1,
-                color: `hsla(${currentHue + (Math.random() * 30 - 15)}, 80%, 70%, `
+                color: `rgba(${r}, ${g}, ${b}, `
             });
         }
     });
@@ -175,14 +199,14 @@ function setupCanvasInteractions() {
 function animateCanvas() {
     if (mainScreen.classList.contains('hidden')) return;
 
-    ctx.fillStyle = 'rgba(8, 8, 10, 0.2)';
+    ctx.fillStyle = 'rgba(11, 15, 25, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < particles.length; i++) {
         let p = particles[i];
         p.x += p.speedX;
         p.y += p.speedY;
-        p.alpha -= 0.008;
+        p.alpha -= (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
 
         ctx.fillStyle = p.color + p.alpha + ')';
         ctx.beginPath();
