@@ -8,12 +8,18 @@ let startBtn;
 let logoutBtn;
 let userDisplay;
 let timerDisplay;
+let paletteToggleBtn;
+let sidePalette;
 
 let canvas;
 let ctx;
 let particles = [];
 let isDrawing = false;
 let currentRGB = { r: 59, g: 130, b: 246 };
+let maxParticlesPerFrame = 3;
+let baseParticleSize = 4;
+let particleSpeedFactor = 1;
+let currentShape = 'circle';
 
 function init() {
     loginScreen = document.getElementById('login-screen');
@@ -23,6 +29,8 @@ function init() {
     logoutBtn = document.getElementById('logout-btn');
     userDisplay = document.getElementById('user-display');
     timerDisplay = document.getElementById('timer-display');
+    paletteToggleBtn = document.getElementById('palette-toggle-btn');
+    sidePalette = document.getElementById('side-palette');
 
     canvas = document.getElementById('relax-canvas');
     ctx = canvas.getContext('2d');
@@ -37,6 +45,28 @@ function init() {
 
     startBtn.addEventListener('click', handleLogin);
     logoutBtn.addEventListener('click', handleLogout);
+
+    paletteToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidePalette.classList.toggle('closed');
+        paletteToggleBtn.classList.toggle('active');
+    });
+
+    document.addEventListener('click', () => {
+        if (sidePalette && !sidePalette.classList.contains('closed')) {
+            sidePalette.classList.add('closed');
+            paletteToggleBtn.classList.remove('active');
+        }
+    });
+
+    document.querySelectorAll('.shape-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            currentShape = e.currentTarget.getAttribute('data-shape');
+        });
+    });
 
     document.querySelectorAll('.color-dot').forEach(dot => {
         dot.addEventListener('click', (e) => {
@@ -53,6 +83,30 @@ function init() {
         picker.addEventListener('input', (e) => {
             document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
             currentRGB = hexToRgb(e.target.value);
+        });
+    }
+
+    const countSlider = document.getElementById('particle-count-slider');
+    if (countSlider) {
+        maxParticlesPerFrame = parseInt(countSlider.value);
+        countSlider.addEventListener('input', (e) => {
+            maxParticlesPerFrame = parseInt(e.target.value);
+        });
+    }
+
+    const sizeSlider = document.getElementById('particle-size-slider');
+    if (sizeSlider) {
+        baseParticleSize = parseInt(sizeSlider.value);
+        sizeSlider.addEventListener('input', (e) => {
+            baseParticleSize = parseInt(e.target.value);
+        });
+    }
+
+    const speedSlider = document.getElementById('particle-speed-slider');
+    if (speedSlider) {
+        particleSpeedFactor = parseInt(speedSlider.value) / 5;
+        speedSlider.addEventListener('input', (e) => {
+            particleSpeedFactor = parseInt(e.target.value) / 5;
         });
     }
 
@@ -85,6 +139,12 @@ function handleLogout() {
     window.DataStorage.clearUserData();
     currentUser = null;
     showLoginScreen();
+}
+
+function showLoginScreen() {
+    mainScreen.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+    usernameInput.value = '';
 }
 
 function showMainScreen() {
@@ -140,60 +200,88 @@ function resizeCanvas() {
 
 function setupCanvasInteractions() {
     window.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
         isDrawing = true;
     });
     window.addEventListener('mouseup', () => isDrawing = false);
     
     window.addEventListener('mousemove', (e) => {
         if (!isDrawing) return;
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
         
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < maxParticlesPerFrame; i++) {
             const variance = Math.floor(Math.random() * 40 - 20);
             const r = Math.max(0, Math.min(255, currentRGB.r + variance));
             const g = Math.max(0, Math.min(255, currentRGB.g + variance));
             const b = Math.max(0, Math.min(255, currentRGB.b + variance));
             
+            const sizeVariance = (Math.random() * 0.5 + 0.75);
+            
             particles.push({
                 x: e.clientX,
                 y: e.clientY,
-                size: Math.random() * 3 + 1,
-                speedX: (Math.random() - 0.5) * 1.5,
-                speedY: (Math.random() - 0.5) * 1.5,
+                size: baseParticleSize * sizeVariance,
+                speedX: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
+                speedY: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
                 alpha: 1,
+                shape: currentShape,
                 color: `rgba(${r}, ${g}, ${b}, `
             });
         }
     });
 
     window.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
         isDrawing = true;
     });
     window.addEventListener('touchend', () => isDrawing = false);
     window.addEventListener('touchmove', (e) => {
         if (!isDrawing || e.touches.length === 0) return;
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
         
         let touch = e.touches[0];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < maxParticlesPerFrame; i++) {
             const variance = Math.floor(Math.random() * 40 - 20);
             const r = Math.max(0, Math.min(255, currentRGB.r + variance));
             const g = Math.max(0, Math.min(255, currentRGB.g + variance));
             const b = Math.max(0, Math.min(255, currentRGB.b + variance));
 
+            const sizeVariance = (Math.random() * 0.5 + 0.75);
+
             particles.push({
                 x: touch.clientX,
                 y: touch.clientY,
-                size: Math.random() * 3 + 1,
-                speedX: (Math.random() - 0.5) * 1.5,
-                speedY: (Math.random() - 0.5) * 1.5,
+                size: baseParticleSize * sizeVariance,
+                speedX: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
+                speedY: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
                 alpha: 1,
+                shape: currentShape,
                 color: `rgba(${r}, ${g}, ${b}, `
             });
         }
     });
+}
+
+function drawStar(x, y, spikes, outerRadius, innerRadius) {
+    let rot = Math.PI / 2 * 3;
+    let cx = x;
+    let cy = y;
+    let step = Math.PI / spikes;
+
+    ctx.moveTo(x, y - outerRadius);
+    for (let i = 0; i < spikes; i++) {
+        cx = x + Math.cos(rot) * outerRadius;
+        cy = y + Math.sin(rot) * outerRadius;
+        ctx.lineTo(cx, cy);
+        rot += step;
+
+        cx = x + Math.cos(rot) * innerRadius;
+        cy = y + Math.sin(rot) * innerRadius;
+        ctx.lineTo(cx, cy);
+        rot += step;
+    }
+    ctx.lineTo(x, y - outerRadius);
+    ctx.closePath();
 }
 
 function animateCanvas() {
@@ -209,9 +297,31 @@ function animateCanvas() {
         p.alpha -= (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
 
         ctx.fillStyle = p.color + p.alpha + ')';
+        ctx.strokeStyle = p.color + p.alpha + ')';
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
+
+        if (p.shape === 'square') {
+            ctx.fillRect(p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
+        } else if (p.shape === 'triangle') {
+            ctx.moveTo(p.x, p.y - p.size);
+            ctx.lineTo(p.x + p.size, p.y + p.size);
+            ctx.lineTo(p.x - p.size, p.y + p.size);
+            ctx.closePath();
+            ctx.fill();
+        } else if (p.shape === 'star') {
+            drawStar(p.x, p.y, 5, p.size * 1.8, p.size * 0.8);
+            ctx.fill();
+        } else if (p.shape === 'cross') {
+            ctx.lineWidth = p.size * 0.5;
+            ctx.moveTo(p.x - p.size, p.y);
+            ctx.lineTo(p.x + p.size, p.y);
+            ctx.moveTo(p.x, p.y - p.size);
+            ctx.lineTo(p.x, p.y + p.size);
+            ctx.stroke();
+        } else {
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         if (p.alpha <= 0) {
             particles.splice(i, 1);
