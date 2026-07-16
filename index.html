@@ -12,7 +12,7 @@
         <div class="card">
             <h1>Rest Time</h1>
             <input type="text" id="username-input" placeholder="What is your name?">
-            <button id="start-btn">Enter Space</button>
+            <button id="start-btn">Rest</button>
         </div>
     </div>
 
@@ -28,23 +28,79 @@
 
         <div id="version-display" class="version-tag"></div>
 
-        <div class="color-palette" onclick="event.stopPropagation()">
-            <button class="color-dot" data-color="#ef4444" style="background: #ef4444;"></button>
-            <button class="color-dot" data-color="#f59e0b" style="background: #f59e0b;"></button>
-            <button class="color-dot" data-color="#10b981" style="background: #10b981;"></button>
-            <button class="color-dot" data-color="#06b6d4" style="background: #06b6d4;"></button>
-            <button class="color-dot active" data-color="#3b82f6" style="background: #3b82f6;"></button>
-            <button class="color-dot" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
-            <button class="color-dot" data-color="#ec4899" style="background: #ec4899;"></button>
-            
-            <div class="custom-color-wrapper">
-                <input type="color" id="custom-color-picker" value="#3b82f6">
+        <button id="palette-toggle-btn" class="palette-toggle">
+            <span class="toggle-icon"></span>
+        </button>
+
+        <div id="side-palette" class="color-palette closed" onclick="event.stopPropagation()">
+            <div class="palette-row">
+                <button class="color-dot" data-color="#ef4444" style="background: #ef4444;"></button>
+                <button class="color-dot" data-color="#f59e0b" style="background: #f59e0b;"></button>
+                <button class="color-dot" data-color="#10b981" style="background: #10b981;"></button>
+                <button class="color-dot" data-color="#06b6d4" style="background: #06b6d4;"></button>
+                <button class="color-dot active" data-color="#3b82f6" style="background: #3b82f6;"></button>
+                <button class="color-dot" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
+                <button class="color-dot" data-color="#ec4899" style="background: #ec4899;"></button>
+
+                <div class="custom-color-wrapper">
+                    <input type="color" id="custom-color-picker" value="#3b82f6">
+                </div>
             </div>
 
             <div class="palette-divider"></div>
 
-            <div class="time-slider-wrapper" title="Duração das estrelas">
-                <input type="range" id="particle-lifetime-slider" min="1" max="10" value="5">
+            <div class="palette-row">
+                <div class="shape-selector">
+                    <button class="shape-btn active" data-shape="circle" title="Circle">○</button>
+                    <button class="shape-btn" data-shape="square" title="Square">□</button>
+                    <button class="shape-btn" data-shape="triangle" title="Triangle">△</button>
+                    <button class="shape-btn" data-shape="star" title="Star">★</button>
+                    <button class="shape-btn" data-shape="cross" title="Cross">＋</button>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <div class="slider-container">
+                    <span class="slider-label">TIME</span>
+                    <span class="slider-sign">-</span>
+                    <div class="time-slider-wrapper">
+                        <input type="range" id="particle-lifetime-slider" min="1" max="10" value="5">
+                    </div>
+                    <span class="slider-sign">+</span>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <div class="slider-container">
+                    <span class="slider-label">COUNT</span>
+                    <span class="slider-sign">-</span>
+                    <div class="count-slider-wrapper">
+                        <input type="range" id="particle-count-slider" min="1" max="10" value="3">
+                    </div>
+                    <span class="slider-sign">+</span>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <div class="slider-container">
+                    <span class="slider-label">SIZE</span>
+                    <span class="slider-sign">-</span>
+                    <div class="size-slider-wrapper">
+                        <input type="range" id="particle-size-slider" min="1" max="10" value="4">
+                    </div>
+                    <span class="slider-sign">+</span>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <div class="slider-container">
+                    <span class="slider-label">SPEED</span>
+                    <span class="slider-sign">-</span>
+                    <div class="speed-slider-wrapper">
+                        <input type="range" id="particle-speed-slider" min="1" max="10" value="5">
+                    </div>
+                    <span class="slider-sign">+</span>
+                </div>
             </div>
         </div>
 
