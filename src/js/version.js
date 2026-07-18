@@ -1,5 +1,5 @@
 const GameVersion = {
-    current: "v0.4.2",
+    current: "v0.5.0",
     init: function() {
         const display = document.getElementById('version-display');
         if (display) {
