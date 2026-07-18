@@ -111,6 +111,212 @@ button:hover {
     color: #3b82f6;
 }
 
+.music-toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #131a26;
+    color: #3b82f6;
+    border: 1px solid #1e293b;
+    padding: 8px 14px;
+    font-size: 12px;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.music-toggle-btn:hover {
+    background: #1e293b;
+    color: #fff;
+}
+
+.music-box {
+    position: absolute;
+    top: 58px;
+    right: 20px;
+    background: #131a26;
+    border: 1px solid #1e293b;
+    width: 280px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 12;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.music-box.closed {
+    display: none !important;
+}
+
+.music-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.music-panel-title {
+    font-size: 11px;
+    color: #475569;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.playlist-container {
+    max-height: 140px;
+    overflow-y: auto;
+    background: #0b0f19;
+    border: 1px solid #1e293b;
+    display: flex;
+    flex-direction: column;
+}
+
+.playlist-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+    background: #0b0f19;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+    background: #1e293b;
+}
+
+.no-tracks-hint {
+    font-size: 11px;
+    color: #475569;
+    text-align: center;
+    padding: 24px 8px;
+}
+
+.track-item {
+    font-size: 11px;
+    color: #64748b;
+    padding: 8px 12px;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #1e293b;
+    transition: background 0.2s, color 0.2s;
+}
+
+.track-item:hover {
+    background: #1a2333;
+    color: #cbd5e1;
+}
+
+.track-item.active {
+    color: #3b82f6;
+    font-weight: bold;
+    background: #1e293b;
+    border-left: 2px solid #3b82f6;
+}
+
+.music-upload-btn {
+    background: transparent;
+    color: #64748b;
+    border: 1px dashed #334155;
+    padding: 8px;
+    text-align: center;
+    font-size: 11px;
+    cursor: pointer;
+    display: block;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.music-upload-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.music-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.music-ctrl-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #3b82f6;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.music-ctrl-btn:hover:not(:disabled) {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+.music-ctrl-btn:disabled {
+    color: #334155;
+    border-color: #1e293b;
+    cursor: not-allowed;
+}
+
+.music-volume-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.music-sign {
+    font-size: 10px;
+    color: #475569;
+    width: 10px;
+    text-align: center;
+}
+
+.volume-slider-wrapper {
+    width: 100%;
+    max-width: 120px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+}
+
+#music-volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    background: #1e293b;
+    cursor: pointer;
+    outline: none;
+}
+
+#music-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 6px;
+    height: 12px;
+    background: #64748b;
+    cursor: pointer;
+}
+
+#music-volume-slider::-moz-range-thumb {
+    width: 6px;
+    height: 12px;
+    background: #64748b;
+    cursor: pointer;
+    border: none;
+}
+
 .palette-toggle {
     position: absolute;
     bottom: 20px;
@@ -338,8 +544,8 @@ button:hover {
 
 .version-tag {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 58px;
+    left: 20px;
     font-size: 10px;
     color: #475569;
     z-index: 10;
