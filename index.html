@@ -72,9 +72,22 @@
                 <button class="color-dot" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
                 <button class="color-dot" data-color="#ec4899" style="background: #ec4899;"></button>
                 
-                
                 <div class="custom-color-wrapper">
                     <input type="color" id="custom-color-picker" value="#3b82f6">
+                </div>
+
+                <div class="gradient-system-wrapper">
+                    <button id="gradient-menu-toggle-btn" class="gradient-toggle-btn" title="Toggle Gradient">▧</button>
+                    <div id="gradient-popover" class="gradient-popover closed" onclick="event.stopPropagation()">
+                        <div class="gradient-popover-header">
+                            <span>GRADIENT ENGINE</span>
+                            <button id="add-gradient-color-btn" class="gradient-add-btn">＋</button>
+                        </div>
+                        <div id="gradient-pickers-container" class="gradient-pickers-list"></div>
+                        <div class="gradient-popover-footer">
+                            <button id="apply-gradient-btn" class="gradient-apply-btn">APPLY</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -144,3 +157,4 @@
     <script src="src/js/time.js"></script>
     <script src="src/js/main.js"></script>
 </body>
+</html>
