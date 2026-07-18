@@ -168,21 +168,36 @@ async function handleMusicUpload(e) {
 
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
         const trackData = {
             name: file.name,
             file: file
         };
-        
         await window.DataStorage.saveSingleTrack(trackData);
-        trackData.url = URL.createObjectURL(file);
-        uploadedTracks.push(trackData);
     }
     
-    renderPlaylist();
+    e.target.value = '';
+    
+    try {
+        const savedTracks = await window.DataStorage.loadMusicData();
+        
+        uploadedTracks.forEach(track => {
+            if (track.url) URL.revokeObjectURL(track.url);
+        });
 
-    if (activeTrackIndex === -1 && uploadedTracks.length > 0) {
-        selectTrack(uploadedTracks.length - files.length);
+        uploadedTracks = savedTracks.filter(t => t && t.file).map(track => ({
+            id: track.id,
+            name: track.name,
+            file: track.file,
+            url: URL.createObjectURL(track.file)
+        }));
+        
+        renderPlaylist();
+
+        if (activeTrackIndex === -1 && uploadedTracks.length > 0) {
+            selectTrack(0);
+        }
+    } catch (err) {
+        console.error(err);
     }
 }
 
@@ -287,12 +302,6 @@ async function handleLogout() {
     showLoginScreen();
 }
 
-function showLoginScreen() {
-    mainScreen.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
-    usernameInput.value = '';
-}
-
 async function showMainScreen() {
     if (!currentUser) return;
 
@@ -311,7 +320,7 @@ async function showMainScreen() {
     try {
         const savedTracks = await window.DataStorage.loadMusicData();
         
-        uploadedTracks = savedTracks.map(track => {
+        uploadedTracks = savedTracks.filter(t => t && t.file).map(track => {
             return {
                 id: track.id,
                 name: track.name,
