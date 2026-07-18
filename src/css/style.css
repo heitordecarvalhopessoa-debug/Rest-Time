@@ -571,3 +571,125 @@ button:hover {
     font-size: 11px;
     pointer-events: none;
 }
+
+.gradient-system-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.gradient-toggle-btn {
+    width: 14px;
+    height: 14px;
+    background: #131a26;
+    border: 1px solid #1e293b;
+    color: #64748b;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.gradient-toggle-btn:hover, .gradient-toggle-btn.active {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.gradient-popover {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #131a26;
+    border: 1px solid #1e293b;
+    padding: 10px;
+    width: 160px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.gradient-popover.closed {
+    display: none !important;
+}
+
+.gradient-popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9px;
+    color: #475569;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.gradient-add-btn {
+    background: transparent;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 0;
+}
+
+.gradient-add-btn:hover {
+    color: #2563eb;
+}
+
+.gradient-pickers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.gradient-row-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0b0f19;
+    padding: 4px 6px;
+    border: 1px solid #1e293b;
+}
+
+.gradient-color-input {
+    width: 24px;
+    height: 14px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.gradient-remove-btn {
+    background: transparent;
+    border: none;
+    color: #475569;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 0 2px;
+}
+
+.gradient-remove-btn:hover {
+    color: #ef4444;
+}
+
+.gradient-apply-btn {
+    width: 100%;
+    padding: 6px;
+    font-size: 10px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.gradient-apply-btn:hover {
+    background: #2563eb;
+}
