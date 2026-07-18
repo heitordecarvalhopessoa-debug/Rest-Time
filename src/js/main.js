@@ -11,6 +11,14 @@ let timerDisplay;
 let paletteToggleBtn;
 let sidePalette;
 
+let musicMenuToggleBtn;
+let musicBoxPanel;
+let musicUpload;
+let audioPlayer;
+let musicPlayBtn;
+let musicPlaylist;
+let musicVolumeSlider;
+
 let canvas;
 let ctx;
 let particles = [];
@@ -20,6 +28,9 @@ let maxParticlesPerFrame = 3;
 let baseParticleSize = 4;
 let particleSpeedFactor = 1;
 let currentShape = 'circle';
+
+let uploadedTracks = [];
+let activeTrackIndex = -1;
 
 function init() {
     loginScreen = document.getElementById('login-screen');
@@ -31,6 +42,14 @@ function init() {
     timerDisplay = document.getElementById('timer-display');
     paletteToggleBtn = document.getElementById('palette-toggle-btn');
     sidePalette = document.getElementById('side-palette');
+
+    musicMenuToggleBtn = document.getElementById('music-menu-toggle-btn');
+    musicBoxPanel = document.getElementById('music-box-panel');
+    musicUpload = document.getElementById('music-upload');
+    audioPlayer = document.getElementById('bg-audio');
+    musicPlayBtn = document.getElementById('music-play-btn');
+    musicPlaylist = document.getElementById('music-playlist');
+    musicVolumeSlider = document.getElementById('music-volume-slider');
 
     canvas = document.getElementById('relax-canvas');
     ctx = canvas.getContext('2d');
@@ -50,12 +69,23 @@ function init() {
         e.stopPropagation();
         sidePalette.classList.toggle('closed');
         paletteToggleBtn.classList.toggle('active');
+        musicBoxPanel.classList.add('closed');
+    });
+
+    musicMenuToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        musicBoxPanel.classList.toggle('closed');
+        sidePalette.classList.add('closed');
+        paletteToggleBtn.classList.remove('active');
     });
 
     document.addEventListener('click', () => {
         if (sidePalette && !sidePalette.classList.contains('closed')) {
             sidePalette.classList.add('closed');
             paletteToggleBtn.classList.remove('active');
+        }
+        if (musicBoxPanel && !musicBoxPanel.classList.contains('closed')) {
+            musicBoxPanel.classList.add('closed');
         }
     });
 
@@ -110,8 +140,106 @@ function init() {
         });
     }
 
+    if (audioPlayer && musicVolumeSlider) {
+        audioPlayer.volume = musicVolumeSlider.value / 100;
+        musicVolumeSlider.addEventListener('input', (e) => {
+            audioPlayer.volume = e.target.value / 100;
+        });
+    }
+
+    if (musicUpload) {
+        musicUpload.addEventListener('change', handleMusicUpload);
+    }
+
+    if (musicPlayBtn) {
+        musicPlayBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAudioPlayback();
+        });
+    }
+
     window.addEventListener('resize', resizeCanvas);
     setupCanvasInteractions();
+}
+
+async function handleMusicUpload(e) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        const trackData = {
+            name: file.name,
+            file: file
+        };
+        
+        await window.DataStorage.saveSingleTrack(trackData);
+        trackData.url = URL.createObjectURL(file);
+        uploadedTracks.push(trackData);
+    }
+    
+    renderPlaylist();
+
+    if (activeTrackIndex === -1 && uploadedTracks.length > 0) {
+        selectTrack(uploadedTracks.length - files.length);
+    }
+}
+
+function renderPlaylist() {
+    if (!musicPlaylist) return;
+    musicPlaylist.innerHTML = '';
+
+    if (uploadedTracks.length === 0) {
+        musicPlaylist.innerHTML = '<div class="no-tracks-hint">No tracks added yet.</div>';
+        return;
+    }
+
+    uploadedTracks.forEach((track, index) => {
+        const item = document.createElement('div');
+        item.className = 'track-item' + (index === activeTrackIndex ? ' active' : '');
+        item.textContent = track.name;
+        item.title = track.name;
+        
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectTrack(index);
+        });
+        
+        musicPlaylist.appendChild(item);
+    });
+}
+
+function selectTrack(index) {
+    if (!audioPlayer || !uploadedTracks[index]) return;
+
+    activeTrackIndex = index;
+    
+    if (!uploadedTracks[index].url && uploadedTracks[index].file) {
+        uploadedTracks[index].url = URL.createObjectURL(uploadedTracks[index].file);
+    }
+
+    audioPlayer.src = uploadedTracks[index].url;
+    musicPlayBtn.disabled = false;
+    
+    renderPlaylist();
+    
+    audioPlayer.play().then(() => {
+        musicPlayBtn.textContent = '⏸';
+    }).catch(err => console.log("Playback interrupted: ", err));
+}
+
+function toggleAudioPlayback() {
+    if (!audioPlayer || activeTrackIndex === -1) return;
+
+    if (audioPlayer.paused) {
+        audioPlayer.play().then(() => {
+            musicPlayBtn.textContent = '⏸';
+        });
+    } else {
+        audioPlayer.pause();
+        musicPlayBtn.textContent = '▶';
+    }
 }
 
 function hexToRgb(hex) {
@@ -134,9 +262,27 @@ function handleLogin() {
     showMainScreen();
 }
 
-function handleLogout() {
+async function handleLogout() {
     if (timerInterval) clearInterval(timerInterval);
-    window.DataStorage.clearUserData();
+    
+    if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.src = '';
+    }
+    
+    uploadedTracks.forEach(track => {
+        if (track.url) URL.revokeObjectURL(track.url);
+    });
+
+    uploadedTracks = [];
+    activeTrackIndex = -1;
+    if (musicPlayBtn) {
+        musicPlayBtn.disabled = true;
+        musicPlayBtn.textContent = '▶';
+    }
+    renderPlaylist();
+
+    await window.DataStorage.clearUserData();
     currentUser = null;
     showLoginScreen();
 }
@@ -147,7 +293,7 @@ function showLoginScreen() {
     usernameInput.value = '';
 }
 
-function showMainScreen() {
+async function showMainScreen() {
     if (!currentUser) return;
 
     loginScreen.classList.add('hidden');
@@ -160,6 +306,31 @@ function showMainScreen() {
 
     if (window.StarTimeManager) {
         window.StarTimeManager.init();
+    }
+
+    try {
+        const savedTracks = await window.DataStorage.loadMusicData();
+        
+        uploadedTracks = savedTracks.map(track => {
+            return {
+                id: track.id,
+                name: track.name,
+                file: track.file,
+                url: URL.createObjectURL(track.file)
+            };
+        });
+
+        renderPlaylist();
+        
+        if (uploadedTracks.length > 0) {
+            activeTrackIndex = 0;
+            if (audioPlayer) {
+                audioPlayer.src = uploadedTracks[0].url;
+                musicPlayBtn.disabled = false;
+            }
+        }
+    } catch (err) {
+        console.error(err);
     }
 
     resizeCanvas();
@@ -200,14 +371,14 @@ function resizeCanvas() {
 
 function setupCanvasInteractions() {
     window.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
         isDrawing = true;
     });
     window.addEventListener('mouseup', () => isDrawing = false);
     
     window.addEventListener('mousemove', (e) => {
         if (!isDrawing) return;
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
         
         for (let i = 0; i < maxParticlesPerFrame; i++) {
             const variance = Math.floor(Math.random() * 40 - 20);
@@ -231,13 +402,13 @@ function setupCanvasInteractions() {
     });
 
     window.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
         isDrawing = true;
     });
     window.addEventListener('touchend', () => isDrawing = false);
     window.addEventListener('touchmove', (e) => {
         if (!isDrawing || e.touches.length === 0) return;
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle')) return;
+        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
         
         let touch = e.touches[0];
         for (let i = 0; i < maxParticlesPerFrame; i++) {
