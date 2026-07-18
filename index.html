@@ -12,7 +12,7 @@
         <div class="card">
             <h1>Rest Time</h1>
             <input type="text" id="username-input" placeholder="What is your name?">
-            <button id="start-btn">Rest</button>
+            <button id="start-btn">Enter Space</button>
         </div>
     </div>
 
@@ -24,6 +24,36 @@
                 <span id="timer-display" class="timer-text">00:00</span>
             </div>
             <button id="logout-btn" title="Change Name" class="logout-icon-btn">&times;</button>
+        </div>
+
+        <button id="music-menu-toggle-btn" class="music-toggle-btn">♫ MUSIC</button>
+
+        <div id="music-box-panel" class="music-box closed" onclick="event.stopPropagation()">
+            <div class="music-box-header">
+                <span class="music-panel-title">MUSIC BOX</span>
+            </div>
+            
+            <div id="music-playlist" class="playlist-container">
+                <div class="no-tracks-hint">No tracks added yet.</div>
+            </div>
+
+            <label for="music-upload" class="music-upload-btn">＋ Add Music File</label>
+            <input type="file" id="music-upload" accept="audio/*" style="display: none;">
+
+            <div class="palette-divider"></div>
+
+            <div class="music-controls-row">
+                <button id="music-play-btn" class="music-ctrl-btn" disabled>▶</button>
+                <div class="music-volume-container">
+                    <span class="music-sign">-</span>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" id="music-volume-slider" min="0" max="100" value="50">
+                    </div>
+                    <span class="music-sign">+</span>
+                </div>
+            </div>
+            
+            <audio id="bg-audio" loop></audio>
         </div>
 
         <div id="version-display" class="version-tag"></div>
@@ -41,7 +71,8 @@
                 <button class="color-dot active" data-color="#3b82f6" style="background: #3b82f6;"></button>
                 <button class="color-dot" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
                 <button class="color-dot" data-color="#ec4899" style="background: #ec4899;"></button>
-
+                
+                
                 <div class="custom-color-wrapper">
                     <input type="color" id="custom-color-picker" value="#3b82f6">
                 </div>
