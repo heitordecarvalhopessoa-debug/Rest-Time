@@ -1,7 +1,7 @@
 # Rest Time
-
+---
 > *A minimalist interactive space, paint with glowing particles.*
-
+---
 ### Features
 
 * **Interactive Fluid Painting:** Click and drag to create luminous trails that gently fade away.
