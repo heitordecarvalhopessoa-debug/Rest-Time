@@ -32,6 +32,9 @@ let currentShape = 'circle';
 let uploadedTracks = [];
 let activeTrackIndex = -1;
 
+let isGradientActive = false;
+let gradientColors = ['#3b82f6', '#ec4899'];
+
 function init() {
     loginScreen = document.getElementById('login-screen');
     mainScreen = document.getElementById('main-screen');
@@ -54,6 +57,69 @@ function init() {
     canvas = document.getElementById('relax-canvas');
     ctx = canvas.getContext('2d');
 
+    const gradToggleBtn = document.getElementById('gradient-menu-toggle-btn');
+    const gradPopover = document.getElementById('gradient-popover');
+    const addGradColorBtn = document.getElementById('add-gradient-color-btn');
+    const applyGradBtn = document.getElementById('apply-gradient-btn');
+    const gradContainer = document.getElementById('gradient-pickers-container');
+
+    function renderGradientInputs() {
+        gradContainer.innerHTML = '';
+        gradientColors.forEach((color, idx) => {
+            const row = document.createElement('div');
+            row.className = 'gradient-row-item';
+
+            const input = document.createElement('input');
+            input.type = 'color';
+            input.className = 'gradient-color-input';
+            input.value = color;
+            input.addEventListener('input', (e) => {
+                gradientColors[idx] = e.target.value;
+            });
+
+            row.appendChild(input);
+
+            if (gradientColors.length > 2) {
+                const remBtn = document.createElement('button');
+                remBtn.className = 'gradient-remove-btn';
+                remBtn.innerHTML = '&times;';
+                remBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    gradientColors.splice(idx, 1);
+                    renderGradientInputs();
+                });
+                row.appendChild(remBtn);
+            }
+
+            gradContainer.appendChild(row);
+        });
+    }
+
+    gradToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        gradPopover.classList.toggle('closed');
+        gradToggleBtn.classList.toggle('active');
+        musicBoxPanel.classList.add('closed');
+    });
+
+    addGradColorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (gradientColors.length < 5) {
+            gradientColors.push('#ffffff');
+            renderGradientInputs();
+        }
+    });
+
+    applyGradBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isGradientActive = true;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        gradPopover.classList.add('closed');
+        gradToggleBtn.classList.remove('active');
+    });
+
+    renderGradientInputs();
+
     currentUser = window.DataStorage.loadUserData();
 
     if (currentUser) {
@@ -70,6 +136,8 @@ function init() {
         sidePalette.classList.toggle('closed');
         paletteToggleBtn.classList.toggle('active');
         musicBoxPanel.classList.add('closed');
+        gradPopover.classList.add('closed');
+        gradToggleBtn.classList.remove('active');
     });
 
     musicMenuToggleBtn.addEventListener('click', (e) => {
@@ -77,6 +145,8 @@ function init() {
         musicBoxPanel.classList.toggle('closed');
         sidePalette.classList.add('closed');
         paletteToggleBtn.classList.remove('active');
+        gradPopover.classList.add('closed');
+        gradToggleBtn.classList.remove('active');
     });
 
     document.addEventListener('click', () => {
@@ -86,6 +156,10 @@ function init() {
         }
         if (musicBoxPanel && !musicBoxPanel.classList.contains('closed')) {
             musicBoxPanel.classList.add('closed');
+        }
+        if (gradPopover && !gradPopover.classList.contains('closed')) {
+            gradPopover.classList.add('closed');
+            gradToggleBtn.classList.remove('active');
         }
     });
 
@@ -101,6 +175,7 @@ function init() {
     document.querySelectorAll('.color-dot').forEach(dot => {
         dot.addEventListener('click', (e) => {
             e.stopPropagation();
+            isGradientActive = false;
             document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
             e.currentTarget.classList.add('active');
             const hex = e.currentTarget.getAttribute('data-color');
@@ -111,6 +186,7 @@ function init() {
     const picker = document.getElementById('custom-color-picker');
     if (picker) {
         picker.addEventListener('input', (e) => {
+            isGradientActive = false;
             document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
             currentRGB = hexToRgb(e.target.value);
         });
@@ -264,6 +340,28 @@ function hexToRgb(hex) {
     return { r, g, b };
 }
 
+function lerpColor(color1, color2, factor) {
+    const rgb1 = hexToRgb(color1);
+    const rgb2 = hexToRgb(color2);
+    const r = Math.round(rgb1.r + (rgb2.r - rgb1.r) * factor);
+    const g = Math.round(rgb1.g + (rgb2.g - rgb1.g) * factor);
+    const b = Math.round(rgb1.b + (rgb2.b - rgb1.b) * factor);
+    return { r, g, b };
+}
+
+function getDynamicGradientRGB(colors, progress) {
+    if (colors.length === 0) return { r: 255, g: 255, b: 255 };
+    if (colors.length === 1) return hexToRgb(colors[0]);
+    
+    const maxIdx = colors.length - 1;
+    const scaledProgress = progress * maxIdx;
+    const index = Math.floor(scaledProgress);
+    const nextIndex = Math.min(index + 1, maxIdx);
+    const factor = scaledProgress - index;
+    
+    return lerpColor(colors[index], colors[nextIndex], factor);
+}
+
 function handleLogin() {
     const name = usernameInput.value.trim();
     if (!name) return;
@@ -300,6 +398,11 @@ async function handleLogout() {
     await window.DataStorage.clearUserData();
     currentUser = null;
     showLoginScreen();
+}
+
+function showLoginScreen() {
+    loginScreen.classList.remove('hidden');
+    mainScreen.classList.add('hidden');
 }
 
 async function showMainScreen() {
@@ -378,6 +481,24 @@ function resizeCanvas() {
     }
 }
 
+function createParticlesFromSource(x, y) {
+    for (let i = 0; i < maxParticlesPerFrame; i++) {
+        const sizeVariance = (Math.random() * 0.5 + 0.75);
+        
+        particles.push({
+            x: x,
+            y: y,
+            size: baseParticleSize * sizeVariance,
+            speedX: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
+            speedY: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
+            alpha: 1,
+            initialAlpha: 1,
+            shape: currentShape,
+            fixedRGB: !isGradientActive ? { ...currentRGB } : null
+        });
+    }
+}
+
 function setupCanvasInteractions() {
     window.addEventListener('mousedown', (e) => {
         if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
@@ -389,25 +510,7 @@ function setupCanvasInteractions() {
         if (!isDrawing) return;
         if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
         
-        for (let i = 0; i < maxParticlesPerFrame; i++) {
-            const variance = Math.floor(Math.random() * 40 - 20);
-            const r = Math.max(0, Math.min(255, currentRGB.r + variance));
-            const g = Math.max(0, Math.min(255, currentRGB.g + variance));
-            const b = Math.max(0, Math.min(255, currentRGB.b + variance));
-            
-            const sizeVariance = (Math.random() * 0.5 + 0.75);
-            
-            particles.push({
-                x: e.clientX,
-                y: e.clientY,
-                size: baseParticleSize * sizeVariance,
-                speedX: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
-                speedY: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
-                alpha: 1,
-                shape: currentShape,
-                color: `rgba(${r}, ${g}, ${b}, `
-            });
-        }
+        createParticlesFromSource(e.clientX, e.clientY);
     });
 
     window.addEventListener('touchstart', (e) => {
@@ -420,25 +523,7 @@ function setupCanvasInteractions() {
         if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
         
         let touch = e.touches[0];
-        for (let i = 0; i < maxParticlesPerFrame; i++) {
-            const variance = Math.floor(Math.random() * 40 - 20);
-            const r = Math.max(0, Math.min(255, currentRGB.r + variance));
-            const g = Math.max(0, Math.min(255, currentRGB.g + variance));
-            const b = Math.max(0, Math.min(255, currentRGB.b + variance));
-
-            const sizeVariance = (Math.random() * 0.5 + 0.75);
-
-            particles.push({
-                x: touch.clientX,
-                y: touch.clientY,
-                size: baseParticleSize * sizeVariance,
-                speedX: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
-                speedY: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
-                alpha: 1,
-                shape: currentShape,
-                color: `rgba(${r}, ${g}, ${b}, `
-            });
-        }
+        createParticlesFromSource(touch.clientX, touch.clientY);
     });
 }
 
@@ -470,14 +555,33 @@ function animateCanvas() {
     ctx.fillStyle = 'rgba(11, 15, 25, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    const decay = (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
+
     for (let i = 0; i < particles.length; i++) {
         let p = particles[i];
         p.x += p.speedX;
         p.y += p.speedY;
-        p.alpha -= (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
+        p.alpha -= decay;
 
-        ctx.fillStyle = p.color + p.alpha + ')';
-        ctx.strokeStyle = p.color + p.alpha + ')';
+        let r, g, b;
+
+        if (p.fixedRGB) {
+            const variance = Math.floor(Math.random() * 40 - 20);
+            r = Math.max(0, Math.min(255, p.fixedRGB.r + variance));
+            g = Math.max(0, Math.min(255, p.fixedRGB.g + variance));
+            b = Math.max(0, Math.min(255, p.fixedRGB.b + variance));
+        } else {
+            const lifeProgress = 1 - (p.alpha / p.initialAlpha);
+            const targetRGB = getDynamicGradientRGB(gradientColors, Math.min(1, Math.max(0, lifeProgress)));
+            const variance = Math.floor(Math.random() * 20 - 10);
+            r = Math.max(0, Math.min(255, targetRGB.r + variance));
+            g = Math.max(0, Math.min(255, targetRGB.g + variance));
+            b = Math.max(0, Math.min(255, targetRGB.b + variance));
+        }
+
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha})`;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha})`;
+
         ctx.beginPath();
 
         if (p.shape === 'square') {
