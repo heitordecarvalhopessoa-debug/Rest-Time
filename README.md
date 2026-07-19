@@ -22,5 +22,5 @@
 ### How to. Relax
 
 1. **Put in your name** to start relaxing.
-2. **. Drag** anywhere, on the screen to paint with the glowing particles.
+2. **Drag** anywhere, on the screen to paint with the glowing particles.
 3. **Take a rest**. Get some rest.
