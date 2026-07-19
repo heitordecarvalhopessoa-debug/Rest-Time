@@ -1,26 +1,26 @@
 # Rest Time
 
-> *A minimalist interactive space, paint with glowing particles.*
+> *This is a space where you can paint with glowing particles that shine and then fade away.*
 
 ### Features
 
-* **Interactive Fluid Painting:** Click and drag to create luminous trails that gently fade away.
-* **Customizable Particle Physics:**
-* **Duration:** Set how long particles remain on screen before disappearing.
-* **Quantity:** Adjust the number of particles appearing on screen.
-* **Size:** Increase or decrease the size of stars or shapes to your preference.
-* **Speed:** Slow down the speed for a nebula-like effect or increase it to create a shower of shooting stars.
-* **Vector Shape Engine:** Easily switch between shapes such as **Circles**, **Squares**, **Triangles**, **Stars**, and **Crosses**.
-* **Color Selection:** Choose from a palette of relaxing colors. Use the **Color Picker** to set any color you desire.
-* **Personalization and Tracking:** Track your progress by viewing your username and time spent relaxing.
-* **Music:** Choose a song to play while painting on the canvas.
-* **Gradient** Create a gradient for the generated particles.
-* **Transparency** You can add transparency to the particles.
+* **Painting with particles:** You can. Drag your mouse to make trails that glow and then disappear slowly.
+* **Making the particles do what you want:**
+* **How long they stay:** You can decide how long the particles stay on the screen before they go away.
+* **How many particles:** You can choose how particles you want to see on the screen.
+* **Size of the particles:** You can make the stars or shapes bigger or smaller whichever you like.
+* **How fast they move:** You can make them move slowly like a cloud or really fast like a bunch of shooting stars.
+* **Shapes:** You can easily switch between shapes like circles, squares, triangles, stars and crosses.
+* **Colors:** You can pick from a lot of colors. If you want a color you can use the color picker to choose it.
+* **Seeing how you are doing:** You can see your name and how long you have been relaxing.
+* **Music:** You can choose a song to listen to while you paint.
+* **Gradient** You can make a gradient for the particles that are made.
+* **See through particles** You can make the particles see through.
 
 ---
 
-### How to Play & Relax
+### How to. Relax
 
-1. **Enter Your Name** to start your session.
-2. **Click & Drag** anywhere on the screen to paint.
-3. **Rest** get some rest.
+1. **Put in your name** to start relaxing.
+2. **. Drag** anywhere, on the screen to paint with the glowing particles.
+3. **Take a rest**. Get some rest.
