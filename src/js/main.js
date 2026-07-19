@@ -24,6 +24,7 @@ let ctx;
 let particles = [];
 let isDrawing = false;
 let currentRGB = { r: 59, g: 130, b: 246 };
+let currentOpacity = 1.0;
 let maxParticlesPerFrame = 3;
 let baseParticleSize = 4;
 let particleSpeedFactor = 1;
@@ -33,7 +34,10 @@ let uploadedTracks = [];
 let activeTrackIndex = -1;
 
 let isGradientActive = false;
-let gradientColors = ['#3b82f6', '#ec4899'];
+let gradientColors = [
+    { color: '#3b82f6', opacity: 1.0 }, 
+    { color: '#ec4899', opacity: 1.0 }
+];
 
 function init() {
     loginScreen = document.getElementById('login-screen');
@@ -65,19 +69,33 @@ function init() {
 
     function renderGradientInputs() {
         gradContainer.innerHTML = '';
-        gradientColors.forEach((color, idx) => {
+        gradientColors.forEach((item, idx) => {
             const row = document.createElement('div');
             row.className = 'gradient-row-item';
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '5px';
 
             const input = document.createElement('input');
             input.type = 'color';
             input.className = 'gradient-color-input';
-            input.value = color;
+            input.value = item.color;
             input.addEventListener('input', (e) => {
-                gradientColors[idx] = e.target.value;
+                gradientColors[idx].color = e.target.value;
             });
 
             row.appendChild(input);
+
+            const alphaSlider = document.createElement('input');
+            alphaSlider.type = 'range';
+            alphaSlider.min = '0';
+            alphaSlider.max = '100';
+            alphaSlider.value = Math.round(item.opacity * 100);
+            alphaSlider.style.width = '50px';
+            alphaSlider.addEventListener('input', (e) => {
+                gradientColors[idx].opacity = parseInt(e.target.value) / 100;
+            });
+            row.appendChild(alphaSlider);
 
             if (gradientColors.length > 2) {
                 const remBtn = document.createElement('button');
@@ -105,7 +123,7 @@ function init() {
     addGradColorBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (gradientColors.length < 5) {
-            gradientColors.push('#ffffff');
+            gradientColors.push({ color: '#ffffff', opacity: 1.0 });
             renderGradientInputs();
         }
     });
@@ -189,6 +207,13 @@ function init() {
             isGradientActive = false;
             document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
             currentRGB = hexToRgb(e.target.value);
+        });
+    }
+
+    const mainOpacitySlider = document.getElementById('main-opacity-slider');
+    if (mainOpacitySlider) {
+        mainOpacitySlider.addEventListener('input', (e) => {
+            currentOpacity = parseInt(e.target.value) / 100;
         });
     }
 
@@ -341,25 +366,37 @@ function hexToRgb(hex) {
 }
 
 function lerpColor(color1, color2, factor) {
-    const rgb1 = hexToRgb(color1);
-    const rgb2 = hexToRgb(color2);
+    const rgb1 = hexToRgb(color1.color);
+    const rgb2 = hexToRgb(color2.color);
+    
     const r = Math.round(rgb1.r + (rgb2.r - rgb1.r) * factor);
     const g = Math.round(rgb1.g + (rgb2.g - rgb1.g) * factor);
     const b = Math.round(rgb1.b + (rgb2.b - rgb1.b) * factor);
-    return { r, g, b };
+    const alpha = color1.alpha + (color2.alpha - color1.alpha) * factor; 
+
+    return { r, g, b, alpha };
 }
 
 function getDynamicGradientRGB(colors, progress) {
-    if (colors.length === 0) return { r: 255, g: 255, b: 255 };
-    if (colors.length === 1) return hexToRgb(colors[0]);
+    if (colors.length === 0) return { r: 255, g: 255, b: 255, alpha: 1 };
     
-    const maxIdx = colors.length - 1;
+    const formattedColors = colors.map(c => ({
+        color: c.color,
+        alpha: c.opacity !== undefined ? c.opacity : 1
+    }));
+
+    if (formattedColors.length === 1) {
+        const rgb = hexToRgb(formattedColors[0].color);
+        return { ...rgb, alpha: formattedColors[0].alpha };
+    }
+    
+    const maxIdx = formattedColors.length - 1;
     const scaledProgress = progress * maxIdx;
     const index = Math.floor(scaledProgress);
     const nextIndex = Math.min(index + 1, maxIdx);
     const factor = scaledProgress - index;
     
-    return lerpColor(colors[index], colors[nextIndex], factor);
+    return lerpColor(formattedColors[index], formattedColors[nextIndex], factor);
 }
 
 function handleLogin() {
@@ -563,13 +600,14 @@ function animateCanvas() {
         p.y += p.speedY;
         p.alpha -= decay;
 
-        let r, g, b;
+        let r, g, b, finalAlpha;
 
         if (p.fixedRGB) {
             const variance = Math.floor(Math.random() * 40 - 20);
             r = Math.max(0, Math.min(255, p.fixedRGB.r + variance));
             g = Math.max(0, Math.min(255, p.fixedRGB.g + variance));
             b = Math.max(0, Math.min(255, p.fixedRGB.b + variance));
+            finalAlpha = p.alpha * currentOpacity; 
         } else {
             const lifeProgress = 1 - (p.alpha / p.initialAlpha);
             const targetRGB = getDynamicGradientRGB(gradientColors, Math.min(1, Math.max(0, lifeProgress)));
@@ -577,10 +615,11 @@ function animateCanvas() {
             r = Math.max(0, Math.min(255, targetRGB.r + variance));
             g = Math.max(0, Math.min(255, targetRGB.g + variance));
             b = Math.max(0, Math.min(255, targetRGB.b + variance));
+            finalAlpha = p.alpha * targetRGB.alpha; 
         }
 
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha})`;
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${finalAlpha})`;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${finalAlpha})`;
 
         ctx.beginPath();
 
