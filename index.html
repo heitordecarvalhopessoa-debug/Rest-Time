@@ -76,11 +76,22 @@
                     <input type="color" id="custom-color-picker" value="#3b82f6">
                 </div>
 
+                <div class="vertical-divider"></div>
+
+                <div class="slider-container">
+                    <span class="slider-label">OPACITY</span>
+                    <span class="slider-sign">-</span>
+                    <div class="opacity-slider-wrapper" style="width: 60px;">
+                        <input type="range" id="main-opacity-slider" min="0" max="100" value="100">
+                    </div>
+                    <span class="slider-sign">+</span>
+                </div>
+
                 <div class="gradient-system-wrapper">
                     <button id="gradient-menu-toggle-btn" class="gradient-toggle-btn" title="Toggle Gradient">▧</button>
                     <div id="gradient-popover" class="gradient-popover closed" onclick="event.stopPropagation()">
                         <div class="gradient-popover-header">
-                            <span>GRADIENT ENGINE</span>
+                            <span>GRADIENT</span>
                             <button id="add-gradient-color-btn" class="gradient-add-btn">＋</button>
                         </div>
                         <div id="gradient-pickers-container" class="gradient-pickers-list"></div>
