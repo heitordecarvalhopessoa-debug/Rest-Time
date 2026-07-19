@@ -1,7 +1,7 @@
 # Rest Time
----
+
 > *A minimalist interactive space, paint with glowing particles.*
----
+
 ### Features
 
 * **Interactive Fluid Painting:** Click and drag to create luminous trails that gently fade away.
@@ -15,6 +15,7 @@
 * **Personalization and Tracking:** Track your progress by viewing your username and time spent relaxing.
 * **Music:** Choose a song to play while painting on the canvas.
 * **Gradient** Create a gradient for the generated particles.
+* **Transparency** You can add transparency to the particles.
 
 ---
 
