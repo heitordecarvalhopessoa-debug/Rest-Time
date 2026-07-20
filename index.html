@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rest Time</title>
-    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/base.css">
+    <link rel="stylesheet" href="src/css/tools-palette.css">
+    <link rel="stylesheet" href="src/css/ui-controls.css">
 </head>
 <body>
 
@@ -27,9 +29,13 @@
             <button id="logout-btn" title="Logout" class="logout-icon-btn">&times;</button>
         </div>
 
-        <button id="music-menu-toggle-btn" class="music-toggle-btn">♫ MUSIC</button>
-        <button id="pause-btn" class="pause-btn">⏸ PAUSE</button>
-        <button id="eraser-btn" class="eraser-btn">⌫ ERASER</button>
+        <div class="left-controls-column">
+            <button id="music-menu-toggle-btn" class="control-btn">♫ MUSIC</button>
+            <button id="layout-menu-toggle-btn" class="control-btn" title="Saved Layouts">💾 LAYOUTS</button>
+            <button id="pause-btn" class="control-btn">⏸ PAUSE</button>
+            <button id="eraser-btn" class="control-btn">⌫ ERASER</button>
+            <div id="fps-display" class="fps-counter-tag">FPS: 0</div>
+        </div>
 
         <div id="eraser-cursor"></div>
 
@@ -179,9 +185,30 @@
         </div>
     </div>
 
-    <script src="src/js/storage.js"></script>
-    <script src="src/js/version.js"></script>
-    <script src="src/js/time.js"></script>
+    <div id="layout-modal" class="modal hidden">
+        <div class="card layout-card">
+            <h1>Layout Presets</h1>
+            
+            <div class="save-layout-form">
+                <input type="text" id="layout-name-input" placeholder="Layout Name...">
+                <button id="save-layout-btn">Save Current</button>
+            </div>
+
+            <div class="palette-divider" style="margin: 15px 0;"></div>
+
+            <div id="layouts-list" class="layouts-list-container">
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 15px;">
+                <button id="close-layout-btn" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/js/fps.js"></script>
     <script src="src/js/main.js"></script>
+    <script src="src/js/storage.js"></script>
+    <script src="src/js/time.js"></script>
+    <script src="src/js/version.js"></script>
 </body>
 </html>
