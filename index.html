@@ -23,10 +23,15 @@
                 <span class="divider">·</span>
                 <span id="timer-display" class="timer-text">00:00</span>
             </div>
-            <button id="logout-btn" title="Change Name" class="logout-icon-btn">&times;</button>
+            <button id="change-name-btn" title="Change Name" class="logout-icon-btn">✎</button>
+            <button id="logout-btn" title="Logout" class="logout-icon-btn">&times;</button>
         </div>
 
         <button id="music-menu-toggle-btn" class="music-toggle-btn">♫ MUSIC</button>
+        <button id="pause-btn" class="pause-btn">⏸ PAUSE</button>
+        <button id="eraser-btn" class="eraser-btn">⌫ ERASER</button>
+
+        <div id="eraser-cursor"></div>
 
         <div id="music-box-panel" class="music-box closed" onclick="event.stopPropagation()">
             <div class="music-box-header">
@@ -161,6 +166,17 @@
 
         <canvas id="relax-canvas"></canvas>
         <div class="canvas-hint">Click and drag your mouse to paint</div>
+    </div>
+
+    <div id="name-modal" class="modal hidden">
+        <div class="card">
+            <h1>Change Name</h1>
+            <input type="text" id="new-username-input" placeholder="Enter new name">
+            <div class="modal-buttons">
+                <button id="save-name-btn">Save</button>
+                <button id="cancel-name-btn" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script src="src/js/storage.js"></script>
