@@ -6,10 +6,16 @@ let mainScreen;
 let usernameInput;
 let startBtn;
 let logoutBtn;
+let changeNameBtn;
 let userDisplay;
 let timerDisplay;
 let paletteToggleBtn;
 let sidePalette;
+
+let nameModal;
+let newUsernameInput;
+let saveNameBtn;
+let cancelNameBtn;
 
 let musicMenuToggleBtn;
 let musicBoxPanel;
@@ -18,6 +24,14 @@ let audioPlayer;
 let musicPlayBtn;
 let musicPlaylist;
 let musicVolumeSlider;
+
+let pauseBtn;
+let isPaused = false;
+
+let eraserBtn;
+let isEraserActive = false;
+let eraserRadius = 25;
+let eraserCursor;
 
 let canvas;
 let ctx;
@@ -45,10 +59,16 @@ function init() {
     usernameInput = document.getElementById('username-input');
     startBtn = document.getElementById('start-btn');
     logoutBtn = document.getElementById('logout-btn');
+    changeNameBtn = document.getElementById('change-name-btn');
     userDisplay = document.getElementById('user-display');
     timerDisplay = document.getElementById('timer-display');
     paletteToggleBtn = document.getElementById('palette-toggle-btn');
     sidePalette = document.getElementById('side-palette');
+
+    nameModal = document.getElementById('name-modal');
+    newUsernameInput = document.getElementById('new-username-input');
+    saveNameBtn = document.getElementById('save-name-btn');
+    cancelNameBtn = document.getElementById('cancel-name-btn');
 
     musicMenuToggleBtn = document.getElementById('music-menu-toggle-btn');
     musicBoxPanel = document.getElementById('music-box-panel');
@@ -57,6 +77,10 @@ function init() {
     musicPlayBtn = document.getElementById('music-play-btn');
     musicPlaylist = document.getElementById('music-playlist');
     musicVolumeSlider = document.getElementById('music-volume-slider');
+
+    pauseBtn = document.getElementById('pause-btn');
+    eraserBtn = document.getElementById('eraser-btn');
+    eraserCursor = document.getElementById('eraser-cursor');
 
     canvas = document.getElementById('relax-canvas');
     ctx = canvas.getContext('2d');
@@ -149,6 +173,10 @@ function init() {
     startBtn.addEventListener('click', handleLogin);
     logoutBtn.addEventListener('click', handleLogout);
 
+    changeNameBtn.addEventListener('click', openNameModal);
+    saveNameBtn.addEventListener('click', handleSaveName);
+    cancelNameBtn.addEventListener('click', closeNameModal);
+
     paletteToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         sidePalette.classList.toggle('closed');
@@ -166,6 +194,26 @@ function init() {
         gradPopover.classList.add('closed');
         gradToggleBtn.classList.remove('active');
     });
+
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isPaused = !isPaused;
+            pauseBtn.classList.toggle('active', isPaused);
+            pauseBtn.textContent = isPaused ? '▶ RESUME' : '⏸ PAUSE';
+        });
+    }
+
+    if (eraserBtn) {
+        eraserBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isEraserActive = !isEraserActive;
+            eraserBtn.classList.toggle('active', isEraserActive);
+            if (!isEraserActive && eraserCursor) {
+                eraserCursor.style.display = 'none';
+            }
+        });
+    }
 
     document.addEventListener('click', () => {
         if (sidePalette && !sidePalette.classList.contains('closed')) {
@@ -230,6 +278,7 @@ function init() {
         baseParticleSize = parseInt(sizeSlider.value);
         sizeSlider.addEventListener('input', (e) => {
             baseParticleSize = parseInt(e.target.value);
+            eraserRadius = Math.max(15, baseParticleSize * 5);
         });
     }
 
@@ -261,6 +310,26 @@ function init() {
 
     window.addEventListener('resize', resizeCanvas);
     setupCanvasInteractions();
+}
+
+function openNameModal() {
+    if (!currentUser) return;
+    newUsernameInput.value = currentUser.name;
+    nameModal.classList.remove('hidden');
+}
+
+function closeNameModal() {
+    nameModal.classList.add('hidden');
+}
+
+function handleSaveName() {
+    const newName = newUsernameInput.value.trim();
+    if (!newName || !currentUser) return;
+
+    currentUser.name = newName;
+    window.DataStorage.saveUserData(currentUser);
+    userDisplay.textContent = currentUser.name;
+    closeNameModal();
 }
 
 async function handleMusicUpload(e) {
@@ -536,31 +605,90 @@ function createParticlesFromSource(x, y) {
     }
 }
 
-function setupCanvasInteractions() {
-    window.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
-        isDrawing = true;
+function eraseParticlesAt(x, y) {
+    const radiusSq = eraserRadius * eraserRadius;
+    particles = particles.filter(p => {
+        const dx = p.x - x;
+        const dy = p.y - y;
+        return (dx * dx + dy * dy) > radiusSq;
     });
+}
+
+function setupCanvasInteractions() {
+    const isUIElement = (target) => {
+        return target.closest('.hotbar') || target.closest('.color-palette') || 
+               target.closest('.palette-toggle') || target.closest('.music-box') || 
+               target.closest('.music-toggle-btn') || target.closest('.pause-btn') || 
+               target.closest('.eraser-btn') || target.closest('.modal');
+    };
+
+    const updateEraserCursorPosition = (clientX, clientY) => {
+        if (isEraserActive && eraserCursor) {
+            eraserCursor.style.display = 'block';
+            eraserCursor.style.left = clientX + 'px';
+            eraserCursor.style.top = clientY + 'px';
+            eraserCursor.style.width = (eraserRadius * 2) + 'px';
+            eraserCursor.style.height = (eraserRadius * 2) + 'px';
+        } else if (eraserCursor) {
+            eraserCursor.style.display = 'none';
+        }
+    };
+
+    window.addEventListener('mousedown', (e) => {
+        if (isUIElement(e.target)) return;
+        isDrawing = true;
+        if (isEraserActive) {
+            eraseParticlesAt(e.clientX, e.clientY);
+        }
+    });
+    
     window.addEventListener('mouseup', () => isDrawing = false);
     
     window.addEventListener('mousemove', (e) => {
+        updateEraserCursorPosition(e.clientX, e.clientY);
+
         if (!isDrawing) return;
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
+        if (isUIElement(e.target)) return;
         
-        createParticlesFromSource(e.clientX, e.clientY);
+        if (isEraserActive) {
+            eraseParticlesAt(e.clientX, e.clientY);
+        } else {
+            createParticlesFromSource(e.clientX, e.clientY);
+        }
+    });
+
+    window.addEventListener('mouseleave', () => {
+        if (eraserCursor) eraserCursor.style.display = 'none';
     });
 
     window.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
+        if (isUIElement(e.target)) return;
         isDrawing = true;
+        if (isEraserActive && e.touches.length > 0) {
+            let touch = e.touches[0];
+            updateEraserCursorPosition(touch.clientX, touch.clientY);
+            eraseParticlesAt(touch.clientX, touch.clientY);
+        }
     });
-    window.addEventListener('touchend', () => isDrawing = false);
+    
+    window.addEventListener('touchend', () => {
+        isDrawing = false;
+        if (eraserCursor) eraserCursor.style.display = 'none';
+    });
+    
     window.addEventListener('touchmove', (e) => {
-        if (!isDrawing || e.touches.length === 0) return;
-        if (e.target.closest('.hotbar') || e.target.closest('.color-palette') || e.target.closest('.palette-toggle') || e.target.closest('.music-box') || e.target.closest('.music-toggle-btn')) return;
-        
+        if (e.touches.length === 0) return;
         let touch = e.touches[0];
-        createParticlesFromSource(touch.clientX, touch.clientY);
+        updateEraserCursorPosition(touch.clientX, touch.clientY);
+
+        if (!isDrawing) return;
+        if (isUIElement(e.target)) return;
+        
+        if (isEraserActive) {
+            eraseParticlesAt(touch.clientX, touch.clientY);
+        } else {
+            createParticlesFromSource(touch.clientX, touch.clientY);
+        }
     });
 }
 
@@ -596,9 +724,12 @@ function animateCanvas() {
 
     for (let i = 0; i < particles.length; i++) {
         let p = particles[i];
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.alpha -= decay;
+        
+        if (!isPaused) {
+            p.x += p.speedX;
+            p.y += p.speedY;
+            p.alpha -= decay;
+        }
 
         let r, g, b, finalAlpha;
 
