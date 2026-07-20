@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'rest_time_data';
+const LAYOUTS_KEY = 'rest_time_layouts';
 const DB_NAME = 'RestTimeDB';
 const STORE_NAME = 'music_tracks';
 
@@ -38,6 +39,15 @@ const DataStorage = {
 
     saveUserData: (data) => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    },
+
+    loadLayoutsData: () => {
+        const data = localStorage.getItem(LAYOUTS_KEY);
+        return data ? JSON.parse(data) : [];
+    },
+
+    saveLayoutsData: (layouts) => {
+        localStorage.setItem(LAYOUTS_KEY, JSON.stringify(layouts));
     },
 
     clearUserData: async () => {
