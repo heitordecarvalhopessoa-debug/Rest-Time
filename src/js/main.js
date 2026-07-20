@@ -17,6 +17,13 @@ let newUsernameInput;
 let saveNameBtn;
 let cancelNameBtn;
 
+let layoutModal;
+let layoutNameInput;
+let saveLayoutBtn;
+let closeLayoutBtn;
+let layoutMenuToggleBtn;
+let layoutsListContainer;
+
 let musicMenuToggleBtn;
 let musicBoxPanel;
 let musicUpload;
@@ -161,6 +168,8 @@ function init() {
     });
 
     renderGradientInputs();
+
+    initLayoutSystem();
 
     currentUser = window.DataStorage.loadUserData();
 
@@ -310,6 +319,145 @@ function init() {
 
     window.addEventListener('resize', resizeCanvas);
     setupCanvasInteractions();
+}
+
+function initLayoutSystem() {
+    layoutModal = document.getElementById('layout-modal');
+    layoutNameInput = document.getElementById('layout-name-input');
+    saveLayoutBtn = document.getElementById('save-layout-btn');
+    closeLayoutBtn = document.getElementById('close-layout-btn');
+    layoutMenuToggleBtn = document.getElementById('layout-menu-toggle-btn');
+    layoutsListContainer = document.getElementById('layouts-list');
+
+    if (layoutMenuToggleBtn) {
+        layoutMenuToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            renderLayoutsList();
+            layoutModal.classList.remove('hidden');
+        });
+    }
+
+    if (closeLayoutBtn) {
+        closeLayoutBtn.addEventListener('click', () => {
+            layoutModal.classList.add('hidden');
+        });
+    }
+
+    if (saveLayoutBtn) {
+        saveLayoutBtn.addEventListener('click', handleSaveCurrentLayout);
+    }
+}
+
+function getCurrentLayoutState() {
+    return {
+        rgb: currentRGB,
+        opacity: currentOpacity,
+        shape: currentShape,
+        particlesPerFrame: maxParticlesPerFrame,
+        baseSize: baseParticleSize,
+        speedFactor: particleSpeedFactor,
+        lifetimeValue: document.getElementById('particle-lifetime-slider')?.value || 5,
+        isGradient: isGradientActive,
+        gradientColors: gradientColors
+    };
+}
+
+function handleSaveCurrentLayout() {
+    const name = layoutNameInput.value.trim() || `Layout ${Date.now()}`;
+    const layouts = window.DataStorage.loadLayoutsData();
+
+    const newLayout = {
+        id: Date.now(),
+        name: name,
+        config: getCurrentLayoutState()
+    };
+
+    layouts.push(newLayout);
+    window.DataStorage.saveLayoutsData(layouts);
+    
+    layoutNameInput.value = '';
+    renderLayoutsList();
+}
+
+function renderLayoutsList() {
+    if (!layoutsListContainer) return;
+    layoutsListContainer.innerHTML = '';
+
+    const layouts = window.DataStorage.loadLayoutsData();
+
+    if (layouts.length === 0) {
+        layoutsListContainer.innerHTML = '<div class="no-tracks-hint">No saved layouts.</div>';
+        return;
+    }
+
+    layouts.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'layout-item';
+
+        row.innerHTML = `
+            <div class="layout-info">
+                <span class="layout-name">${item.name}</span>
+                <span class="layout-details">Shape: ${item.config.shape} | Size: ${item.config.baseSize}</span>
+            </div>
+            <div class="layout-actions">
+                <button class="layout-btn-action load-btn">Apply</button>
+                <button class="layout-btn-delete delete-btn">&times;</button>
+            </div>
+        `;
+
+        row.querySelector('.load-btn').addEventListener('click', () => {
+            applyLayout(item.config);
+            layoutModal.classList.add('hidden');
+        });
+
+        row.querySelector('.delete-btn').addEventListener('click', () => {
+            deleteLayout(item.id);
+        });
+
+        layoutsListContainer.appendChild(row);
+    });
+}
+
+function deleteLayout(id) {
+    let layouts = window.DataStorage.loadLayoutsData();
+    layouts = layouts.filter(l => l.id !== id);
+    window.DataStorage.saveLayoutsData(layouts);
+    renderLayoutsList();
+}
+
+function applyLayout(config) {
+    currentRGB = config.rgb;
+    currentOpacity = config.opacity;
+    currentShape = config.shape;
+    maxParticlesPerFrame = config.particlesPerFrame;
+    baseParticleSize = config.baseSize;
+    particleSpeedFactor = config.speedFactor;
+    isGradientActive = config.isGradient;
+    if (config.gradientColors) gradientColors = config.gradientColors;
+
+    const setInputValue = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    };
+
+    setInputValue('main-opacity-slider', config.opacity * 100);
+    setInputValue('particle-count-slider', config.particlesPerFrame);
+    setInputValue('particle-size-slider', config.baseSize);
+    setInputValue('particle-speed-slider', config.speedFactor * 5);
+    
+    const lifetimeSlider = document.getElementById('particle-lifetime-slider');
+    if (lifetimeSlider) {
+        lifetimeSlider.value = config.lifetimeValue;
+        if (window.StarTimeManager) window.StarTimeManager.updateDecay(config.lifetimeValue);
+    }
+
+    document.querySelectorAll('.shape-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-shape') === config.shape);
+    });
+
+    if (!isGradientActive) {
+        document.getElementById('gradient-popover')?.classList.add('closed');
+    }
 }
 
 function openNameModal() {
