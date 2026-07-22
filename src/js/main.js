@@ -623,7 +623,7 @@ function toggleAudioPlayback() {
 
     if (audioPlayer.paused) {
         audioPlayer.play().then(() => {
-            musicPlayBtn.textContent = '⏸';
+            musicPlayBtn.textContent = '⏸';                                                                   //Nothing lol
         });
     } else {
         audioPlayer.pause();
@@ -835,7 +835,6 @@ function setupCanvasInteractions() {
     window.addEventListener('mousemove', (e) => {
         updateEraserCursorPosition(e.clientX, e.clientY);
 
-        // Atualiza posição do Buraco Negro com o cursor
         if (window.BlackHoleManager) {
             window.BlackHoleManager.setPosition(e.clientX, e.clientY);
         }
@@ -876,7 +875,6 @@ function setupCanvasInteractions() {
         let touch = e.touches[0];
         updateEraserCursorPosition(touch.clientX, touch.clientY);
 
-        // Atualiza posição do Buraco Negro no evento de toque
         if (window.BlackHoleManager) {
             window.BlackHoleManager.setPosition(touch.clientX, touch.clientY);
         }
@@ -922,7 +920,6 @@ function animateCanvas() {
 
     const decay = (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
 
-    // BURACO NEGRO: Atração de partículas e renderização
     if (window.BlackHoleManager) {
         if (!isPaused) {
             window.BlackHoleManager.updateParticles(particles);
