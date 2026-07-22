@@ -31,7 +31,7 @@
 
         <div class="left-controls-column">
             <button id="music-menu-toggle-btn" class="control-btn">♫ MUSIC</button>
-            <button id="layout-menu-toggle-btn" class="control-btn" title="Saved Layouts">💾 LAYOUTS</button>
+            <button id="layout-menu-toggle-btn" class="control-btn" title="Saved Layouts">➢ LAYOUTS</button>
             <button id="pause-btn" class="control-btn">⏸ PAUSE</button>
             <button id="eraser-btn" class="control-btn">⌫ ERASER</button>
             <div id="fps-display" class="fps-counter-tag">FPS: 0</div>
@@ -89,14 +89,15 @@
 
                 <div class="vertical-divider"></div>
 
-                <div class="slider-container">
-                    <span class="slider-label">OPACITY</span>
-                    <span class="slider-sign">-</span>
-                    <div class="opacity-slider-wrapper" style="width: 60px;">
-                        <input type="range" id="main-opacity-slider" min="0" max="100" value="100">
-                    </div>
-                    <span class="slider-sign">+</span>
+                <div class="shape-selector">
+                    <button class="shape-btn active" data-shape="circle" title="Circle">○</button>
+                    <button class="shape-btn" data-shape="square" title="Square">□</button>
+                    <button class="shape-btn" data-shape="triangle" title="Triangle">△</button>
+                    <button class="shape-btn" data-shape="star" title="Star">★</button>
+                    <button class="shape-btn" data-shape="cross" title="Cross">＋</button>
                 </div>
+
+                <div class="vertical-divider"></div>
 
                 <div class="gradient-system-wrapper">
                     <button id="gradient-menu-toggle-btn" class="gradient-toggle-btn" title="Toggle Gradient">▧</button>
@@ -111,17 +112,48 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="brush-system-wrapper" style="position: relative;">
+                    <button id="brush-menu-toggle-btn" class="gradient-toggle-btn" title="Select Brush">🖌</button>
+                    
+                    <div id="brush-popover" class="gradient-popover closed" onclick="event.stopPropagation()">
+                        <div class="gradient-popover-header">
+                            <span>BRUSHES</span>
+                        </div>
+                        <div class="brush-selector-popover">
+                            <button class="brush-btn active" data-brush="normal" title="Normal Brush">NORMAL</button>
+                            <button class="brush-btn" data-brush="random" title="Random Spray">RANDOM</button>
+                            <button class="brush-btn" data-brush="explode" title="Explosion">EXPLODE</button>
+                            <button class="brush-btn" data-brush="meteor" title="Meteor Brush">METEOR</button>
+                            <button class="brush-btn" data-brush="rain" title="Rain Brush">RAIN</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="blackhole-toggle-btn" class="gradient-toggle-btn" title="BlackHole">🕳️</button>
             </div>
 
             <div class="palette-divider"></div>
 
             <div class="palette-row">
-                <div class="shape-selector">
-                    <button class="shape-btn active" data-shape="circle" title="Circle">○</button>
-                    <button class="shape-btn" data-shape="square" title="Square">□</button>
-                    <button class="shape-btn" data-shape="triangle" title="Triangle">△</button>
-                    <button class="shape-btn" data-shape="star" title="Star">★</button>
-                    <button class="shape-btn" data-shape="cross" title="Cross">＋</button>
+                <div class="slider-container">
+                    <span class="slider-label">OPACITY</span>
+                    <span class="slider-sign">-</span>
+                    <div class="opacity-slider-wrapper" style="width: 60px;">
+                        <input type="range" id="main-opacity-slider" min="0" max="100" value="100">
+                    </div>
+                    <span class="slider-sign">+</span>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <div class="slider-container">
+                    <span class="slider-label">BRUSH SIZE</span>
+                    <span class="slider-sign">-</span>
+                    <div class="brush-size-slider-wrapper" style="width: 60px;">
+                        <input type="range" id="brush-size-slider" min="10" max="100" value="30">
+                    </div>
+                    <span class="slider-sign">+</span>
                 </div>
 
                 <div class="vertical-divider"></div>
@@ -206,6 +238,9 @@
     </div>
 
     <script src="src/js/fps.js"></script>
+    <script src="src/js/shortcuts.js"></script>
+    <script src="src/js/brush.js"></script>
+    <script src="src/js/blackhole.js"></script> 
     <script src="src/js/main.js"></script>
     <script src="src/js/storage.js"></script>
     <script src="src/js/time.js"></script>
