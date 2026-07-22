@@ -98,6 +98,9 @@ function init() {
     const applyGradBtn = document.getElementById('apply-gradient-btn');
     const gradContainer = document.getElementById('gradient-pickers-container');
 
+    const brushToggleBtn = document.getElementById('brush-menu-toggle-btn');
+    const brushPopover = document.getElementById('brush-popover');
+
     function renderGradientInputs() {
         gradContainer.innerHTML = '';
         gradientColors.forEach((item, idx) => {
@@ -144,10 +147,33 @@ function init() {
         });
     }
 
+    const blackHoleBtn = document.getElementById('blackhole-toggle-btn');
+
+    if (blackHoleBtn) {
+        blackHoleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.BlackHoleManager) {
+                window.BlackHoleManager.toggle();
+                blackHoleBtn.classList.toggle('active', window.BlackHoleManager.active);
+            }
+        });
+    }
+
     gradToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         gradPopover.classList.toggle('closed');
         gradToggleBtn.classList.toggle('active');
+        brushPopover.classList.add('closed');
+        brushToggleBtn.classList.remove('active');
+        musicBoxPanel.classList.add('closed');
+    });
+
+    brushToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        brushPopover.classList.toggle('closed');
+        brushToggleBtn.classList.toggle('active');
+        gradPopover.classList.add('closed');
+        gradToggleBtn.classList.remove('active');
         musicBoxPanel.classList.add('closed');
     });
 
@@ -193,6 +219,8 @@ function init() {
         musicBoxPanel.classList.add('closed');
         gradPopover.classList.add('closed');
         gradToggleBtn.classList.remove('active');
+        brushPopover.classList.add('closed');
+        brushToggleBtn.classList.remove('active');
     });
 
     musicMenuToggleBtn.addEventListener('click', (e) => {
@@ -202,6 +230,8 @@ function init() {
         paletteToggleBtn.classList.remove('active');
         gradPopover.classList.add('closed');
         gradToggleBtn.classList.remove('active');
+        brushPopover.classList.add('closed');
+        brushToggleBtn.classList.remove('active');
     });
 
     if (pauseBtn) {
@@ -217,6 +247,7 @@ function init() {
         eraserBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             isEraserActive = !isEraserActive;
+            window.isEraserActive = isEraserActive;
             eraserBtn.classList.toggle('active', isEraserActive);
             if (!isEraserActive && eraserCursor) {
                 eraserCursor.style.display = 'none';
@@ -236,14 +267,29 @@ function init() {
             gradPopover.classList.add('closed');
             gradToggleBtn.classList.remove('active');
         }
+        if (brushPopover && !brushPopover.classList.contains('closed')) {
+            brushPopover.classList.add('closed');
+            brushToggleBtn.classList.remove('active');
+        }
     });
 
-    document.querySelectorAll('.shape-btn').forEach(btn => {
+    document.querySelectorAll('.shape-selector .shape-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.shape-selector .shape-btn').forEach(b => b.classList.remove('active'));
             e.currentTarget.classList.add('active');
             currentShape = e.currentTarget.getAttribute('data-shape');
+        });
+    });
+
+    document.querySelectorAll('.brush-selector-popover .brush-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.brush-selector-popover .brush-btn').forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            const brushType = e.currentTarget.getAttribute('data-brush');
+            BrushManager.setBrush(brushType);
         });
     });
 
@@ -271,6 +317,13 @@ function init() {
     if (mainOpacitySlider) {
         mainOpacitySlider.addEventListener('input', (e) => {
             currentOpacity = parseInt(e.target.value) / 100;
+        });
+    }
+
+    const brushSizeSlider = document.getElementById('brush-size-slider');
+    if (brushSizeSlider) {
+        brushSizeSlider.addEventListener('input', (e) => {
+            BrushManager.setRadius(parseInt(e.target.value));
         });
     }
 
@@ -352,6 +405,7 @@ function getCurrentLayoutState() {
     return {
         rgb: currentRGB,
         opacity: currentOpacity,
+        brushRadius: BrushManager.radius,
         shape: currentShape,
         particlesPerFrame: maxParticlesPerFrame,
         baseSize: baseParticleSize,
@@ -434,6 +488,7 @@ function applyLayout(config) {
     particleSpeedFactor = config.speedFactor;
     isGradientActive = config.isGradient;
     if (config.gradientColors) gradientColors = config.gradientColors;
+    if (config.brushRadius) BrushManager.setRadius(config.brushRadius);
 
     const setInputValue = (id, val) => {
         const el = document.getElementById(id);
@@ -441,6 +496,7 @@ function applyLayout(config) {
     };
 
     setInputValue('main-opacity-slider', config.opacity * 100);
+    setInputValue('brush-size-slider', config.brushRadius || 30);
     setInputValue('particle-count-slider', config.particlesPerFrame);
     setInputValue('particle-size-slider', config.baseSize);
     setInputValue('particle-speed-slider', config.speedFactor * 5);
@@ -735,24 +791,6 @@ function resizeCanvas() {
     }
 }
 
-function createParticlesFromSource(x, y) {
-    for (let i = 0; i < maxParticlesPerFrame; i++) {
-        const sizeVariance = (Math.random() * 0.5 + 0.75);
-        
-        particles.push({
-            x: x,
-            y: y,
-            size: baseParticleSize * sizeVariance,
-            speedX: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
-            speedY: (Math.random() - 0.5) * 1.5 * particleSpeedFactor,
-            alpha: 1,
-            initialAlpha: 1,
-            shape: currentShape,
-            fixedRGB: !isGradientActive ? { ...currentRGB } : null
-        });
-    }
-}
-
 function eraseParticlesAt(x, y) {
     const radiusSq = eraserRadius * eraserRadius;
     particles = particles.filter(p => {
@@ -787,6 +825,8 @@ function setupCanvasInteractions() {
         isDrawing = true;
         if (isEraserActive) {
             eraseParticlesAt(e.clientX, e.clientY);
+        } else {
+            BrushManager.useBrush(e.clientX, e.clientY, true);
         }
     });
     
@@ -795,13 +835,18 @@ function setupCanvasInteractions() {
     window.addEventListener('mousemove', (e) => {
         updateEraserCursorPosition(e.clientX, e.clientY);
 
+        // Atualiza posição do Buraco Negro com o cursor
+        if (window.BlackHoleManager) {
+            window.BlackHoleManager.setPosition(e.clientX, e.clientY);
+        }
+
         if (!isDrawing) return;
         if (isUIElement(e.target)) return;
         
         if (isEraserActive) {
             eraseParticlesAt(e.clientX, e.clientY);
         } else {
-            createParticlesFromSource(e.clientX, e.clientY);
+            BrushManager.useBrush(e.clientX, e.clientY, false);
         }
     });
 
@@ -812,10 +857,12 @@ function setupCanvasInteractions() {
     window.addEventListener('touchstart', (e) => {
         if (isUIElement(e.target)) return;
         isDrawing = true;
+        let touch = e.touches[0];
         if (isEraserActive && e.touches.length > 0) {
-            let touch = e.touches[0];
             updateEraserCursorPosition(touch.clientX, touch.clientY);
             eraseParticlesAt(touch.clientX, touch.clientY);
+        } else if (e.touches.length > 0) {
+            BrushManager.useBrush(touch.clientX, touch.clientY, true);
         }
     });
     
@@ -829,13 +876,18 @@ function setupCanvasInteractions() {
         let touch = e.touches[0];
         updateEraserCursorPosition(touch.clientX, touch.clientY);
 
+        // Atualiza posição do Buraco Negro no evento de toque
+        if (window.BlackHoleManager) {
+            window.BlackHoleManager.setPosition(touch.clientX, touch.clientY);
+        }
+
         if (!isDrawing) return;
         if (isUIElement(e.target)) return;
         
         if (isEraserActive) {
             eraseParticlesAt(touch.clientX, touch.clientY);
         } else {
-            createParticlesFromSource(touch.clientX, touch.clientY);
+            BrushManager.useBrush(touch.clientX, touch.clientY, false);
         }
     });
 }
@@ -869,6 +921,14 @@ function animateCanvas() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const decay = (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
+
+    // BURACO NEGRO: Atração de partículas e renderização
+    if (window.BlackHoleManager) {
+        if (!isPaused) {
+            window.BlackHoleManager.updateParticles(particles);
+        }
+        window.BlackHoleManager.draw(ctx);
+    }
 
     for (let i = 0; i < particles.length; i++) {
         let p = particles[i];
