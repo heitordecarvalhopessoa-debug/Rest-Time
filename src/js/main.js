@@ -623,7 +623,7 @@ function toggleAudioPlayback() {
 
     if (audioPlayer.paused) {
         audioPlayer.play().then(() => {
-            musicPlayBtn.textContent = '⏸';                                                                   //Nothing lol
+            musicPlayBtn.textContent = '⏸';
         });
     } else {
         audioPlayer.pause();
@@ -713,6 +713,10 @@ async function handleLogout() {
 function showLoginScreen() {
     loginScreen.classList.remove('hidden');
     mainScreen.classList.add('hidden');
+
+    if (window.LoadingScreen) {
+        window.LoadingScreen.hide();
+    }
 }
 
 async function showMainScreen() {
@@ -759,6 +763,10 @@ async function showMainScreen() {
     updateTimerDisplay(currentUser.totalTimeSpent);
     startTimer();
     animateCanvas();
+
+    if (window.LoadingScreen) {
+        window.LoadingScreen.hide();
+    }
 }
 
 function startTimer() {
