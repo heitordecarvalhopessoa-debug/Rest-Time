@@ -7,8 +7,16 @@
     <link rel="stylesheet" href="src/css/base.css">
     <link rel="stylesheet" href="src/css/tools-palette.css">
     <link rel="stylesheet" href="src/css/ui-controls.css">
+    <link rel="icon" type="image/png" href="src/imgs/icon.png">
 </head>
 <body>
+    <div id="loading-screen">
+        <div class="loader-content">
+            <h1 class="loader-title">Rest Time</h1>
+            <div class="spinner"></div>
+            <p id="loading-text">Loading game...</p>
+        </div>
+    </div>
 
     <div id="login-screen" class="screen">
         <div class="card">
@@ -238,6 +246,7 @@
     </div>
 
     <script src="src/js/fps.js"></script>
+    <script src="src/js/loading.js"></script>
     <script src="src/js/shortcuts.js"></script>
     <script src="src/js/brush.js"></script>
     <script src="src/js/blackhole.js"></script> 
