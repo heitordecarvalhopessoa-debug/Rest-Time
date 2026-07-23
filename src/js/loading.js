@@ -19,7 +19,7 @@ const LoadingScreen = {
             this.setText(message);
             this.element.style.display = 'flex';
             this.element.classList.remove('fade-out');
-        }
+        }   
     },
 
     hide(delay = 500) {
