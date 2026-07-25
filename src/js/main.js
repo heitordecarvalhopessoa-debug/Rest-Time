@@ -60,6 +60,8 @@ let gradientColors = [
     { color: '#ec4899', opacity: 1.0 }
 ];
 
+let isGlowActive = false;
+
 function init() {
     loginScreen = document.getElementById('login-screen');
     mainScreen = document.getElementById('main-screen');
@@ -91,6 +93,30 @@ function init() {
 
     canvas = document.getElementById('relax-canvas');
     ctx = canvas.getContext('2d');
+
+    const glowBtn = document.getElementById('glow-toggle-btn');
+
+    if (glowBtn) {
+        glowBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isGlowActive = !isGlowActive;
+            glowBtn.classList.toggle('active', isGlowActive);
+        });
+    }
+
+    const bgEffectToggle = document.getElementById('bg-effect-toggle');
+    if (bgEffectToggle) {
+        bgEffectToggle.checked = true;
+        if (window.AudioVisualizer) {
+            window.AudioVisualizer.enabled = true;
+        }
+
+        bgEffectToggle.addEventListener('change', (e) => {
+            if (window.AudioVisualizer) {
+                window.AudioVisualizer.enabled = e.target.checked;
+            }
+        });
+    }
 
     const gradToggleBtn = document.getElementById('gradient-menu-toggle-btn');
     const gradPopover = document.getElementById('gradient-popover');
@@ -613,6 +639,11 @@ function selectTrack(index) {
     
     renderPlaylist();
     
+    if (window.AudioVisualizer) {
+        window.AudioVisualizer.init(audioPlayer);
+        window.AudioVisualizer.resume();
+    }
+
     audioPlayer.play().then(() => {
         musicPlayBtn.textContent = '⏸';
     }).catch(err => console.log("Playback interrupted: ", err));
@@ -620,6 +651,11 @@ function selectTrack(index) {
 
 function toggleAudioPlayback() {
     if (!audioPlayer || activeTrackIndex === -1) return;
+
+    if (window.AudioVisualizer) {
+        window.AudioVisualizer.init(audioPlayer);
+        window.AudioVisualizer.resume();
+    }
 
     if (audioPlayer.paused) {
         audioPlayer.play().then(() => {
@@ -926,6 +962,15 @@ function animateCanvas() {
     ctx.fillStyle = 'rgba(11, 15, 25, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    if (window.AudioVisualizer) {
+        if (isGradientActive && gradientColors.length > 0) {
+            window.AudioVisualizer.setGradientStyle(ctx, canvas.width, gradientColors, getDynamicGradientRGB);
+        } else {
+            window.AudioVisualizer.setColor(currentRGB, currentOpacity);
+        }
+        window.AudioVisualizer.draw(ctx, canvas.width, canvas.height);
+    }
+
     const decay = (window.StarTimeManager ? window.StarTimeManager.decayRate : 0.008);
 
     if (window.BlackHoleManager) {
@@ -962,8 +1007,20 @@ function animateCanvas() {
             finalAlpha = p.alpha * targetRGB.alpha; 
         }
 
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${finalAlpha})`;
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${finalAlpha})`;
+        const colorString = `rgba(${r}, ${g}, ${b}, ${finalAlpha})`;
+
+        ctx.save();
+
+        if (isGlowActive) {
+            ctx.shadowBlur = p.size * 3 + 8;
+            ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${finalAlpha * 0.8})`;
+        } else {
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+        }
+
+        ctx.fillStyle = colorString;
+        ctx.strokeStyle = colorString;
 
         ctx.beginPath();
 
@@ -989,6 +1046,8 @@ function animateCanvas() {
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
         }
+
+        ctx.restore();
 
         if (p.alpha <= 0) {
             particles.splice(i, 1);
