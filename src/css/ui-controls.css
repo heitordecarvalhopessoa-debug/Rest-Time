@@ -240,3 +240,27 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+#glow-toggle-btn.active {
+    background: #3b82f6;
+    color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.ui-hidden .hotbar, .ui-hidden .left-controls-column, .ui-hidden .palette-toggle, .ui-hidden .color-palette, .ui-hidden .music-box, .ui-hidden .version-tag, .ui-hidden .canvas-hint {
+    display: none !important;
+}
+
+#exit-zen-hint {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 1px;
+    z-index: 1000;
+    pointer-events: none;
+    transition: opacity 0.5s;
+}
