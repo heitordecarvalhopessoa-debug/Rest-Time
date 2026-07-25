@@ -37,11 +37,13 @@
             <button id="logout-btn" title="Logout" class="logout-icon-btn">&times;</button>
         </div>
 
-        <div class="left-controls-column">
+<div class="left-controls-column">
             <button id="music-menu-toggle-btn" class="control-btn">♫ MUSIC</button>
             <button id="layout-menu-toggle-btn" class="control-btn" title="Saved Layouts">➢ LAYOUTS</button>
             <button id="pause-btn" class="control-btn">⏸ PAUSE</button>
             <button id="eraser-btn" class="control-btn">⌫ ERASER</button>
+            <button id="screenshot-btn" class="control-btn">⌕ SNAPSHOT</button>
+            <button id="hide-ui-btn" class="control-btn">👁 HIDE UI</button>
             <div id="fps-display" class="fps-counter-tag">FPS: 0</div>
         </div>
 
@@ -70,6 +72,11 @@
                     </div>
                     <span class="music-sign">+</span>
                 </div>
+            </div>
+
+            <div class="music-option-row">
+                <input type="checkbox" id="bg-effect-toggle" checked>
+                <label for="bg-effect-toggle">Background Effect</label>
             </div>
             
             <audio id="bg-audio" loop></audio>
@@ -139,6 +146,7 @@
                 </div>
 
                 <button id="blackhole-toggle-btn" class="gradient-toggle-btn" title="BlackHole">🕳️</button>
+                <button id="glow-toggle-btn" class="gradient-toggle-btn" title="Glow Effect">✨</button>
             </div>
 
             <div class="palette-divider"></div>
@@ -245,14 +253,16 @@
         </div>
     </div>
 
+    <script src="src/js/audiovisualizer.js"></script>
+    <script src="src/js/blackhole.js"></script>
+    <script src="src/js/brush.js"></script>
     <script src="src/js/fps.js"></script>
     <script src="src/js/loading.js"></script>
+    <script src="src/js/main.js"></script> 
     <script src="src/js/shortcuts.js"></script>
-    <script src="src/js/brush.js"></script>
-    <script src="src/js/blackhole.js"></script> 
-    <script src="src/js/main.js"></script>
     <script src="src/js/storage.js"></script>
     <script src="src/js/time.js"></script>
     <script src="src/js/version.js"></script>
+    <script src="src/js/zen-screenshot.js"></script>
 </body>
 </html>
