@@ -1055,6 +1055,43 @@ function animateCanvas() {
         }
     }
 
+    if (window.TutorialManager) {
+        window.TutorialManager.init();
+    }
+
+    const webParticles = particles.filter(p => p.isWeb);
+    const maxDistance = 80;
+
+    for (let i = 0; i < webParticles.length; i++) {
+        for (let j = i + 1; j < webParticles.length; j++) {
+            const p1 = webParticles[i];
+            const p2 = webParticles[j];
+
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < maxDistance) {
+                const lineAlpha = (1 - dist / maxDistance) * Math.min(p1.alpha, p2.alpha) * 0.4;
+                
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.lineWidth = 1;
+                
+                const rgb = p1.fixedRGB || currentRGB;
+                ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${lineAlpha})`;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+    }
+
+    window.clearParticles = function() {
+        particles = [];
+    }
+
     requestAnimationFrame(animateCanvas);
 }
 
