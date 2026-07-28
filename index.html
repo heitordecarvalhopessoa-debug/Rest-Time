@@ -37,7 +37,7 @@
             <button id="logout-btn" title="Logout" class="logout-icon-btn">&times;</button>
         </div>
 
-<div class="left-controls-column">
+        <div class="left-controls-column">
             <button id="music-menu-toggle-btn" class="control-btn">♫ MUSIC</button>
             <button id="layout-menu-toggle-btn" class="control-btn" title="Saved Layouts">➢ LAYOUTS</button>
             <button id="pause-btn" class="control-btn">⏸ PAUSE</button>
@@ -45,6 +45,9 @@
             <button id="screenshot-btn" class="control-btn">⌕ SNAPSHOT</button>
             <button id="hide-ui-btn" class="control-btn">👁 HIDE UI</button>
             <div id="fps-display" class="fps-counter-tag">FPS: 0</div>
+            
+            <div class="shortcuts-hint-tag">Press W to see the <b>shortcuts</b></div>
+            <div class="shortcuts-hint-tag">Press R to see the <b>tutorial</b></div>
         </div>
 
         <div id="eraser-cursor"></div>
@@ -80,6 +83,67 @@
             </div>
             
             <audio id="bg-audio" loop></audio>
+        </div>
+
+        ''<div id="shortcuts-modal" class="shortcuts-modal hidden">
+            <div class="shortcuts-card">
+                <div class="shortcuts-header">
+                    <h2>Keyboard Shortcuts</h2>
+                    <span id="close-shortcuts" class="close-shortcuts">&times;</span>
+                </div>
+
+                <div class="shortcuts-list">
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Normal Brush / Modes</span>
+                        <div class="keys"><kbd>1</kbd> to <kbd>6</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Toggle Eraser</span>
+                        <div class="keys"><kbd>Shift</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Pause / Resume</span>
+                        <div class="keys"><kbd>Ctrl</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Black Hole</span>
+                        <div class="keys"><kbd>B</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Clear Particles</span>
+                        <div class="keys"><kbd>C</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Color Menu / Palette</span>
+                        <div class="keys"><kbd>Tab</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Zen Mode (Hide UI)</span>
+                        <div class="keys"><kbd>H</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Take Screenshot</span>
+                        <div class="keys"><kbd>S</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Shortcuts Menu</span>
+                        <div class="keys"><kbd>W</kbd></div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">Tutorial</span>
+                        <div class="keys"><kbd>R</kbd></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="version-display" class="version-tag"></div>
@@ -141,6 +205,7 @@
                             <button class="brush-btn" data-brush="explode" title="Explosion">EXPLODE</button>
                             <button class="brush-btn" data-brush="meteor" title="Meteor Brush">METEOR</button>
                             <button class="brush-btn" data-brush="rain" title="Rain Brush">RAIN</button>
+                            <button class="brush-btn" data-brush="web" title="Web Brush">WEB</button>
                         </div>
                     </div>
                 </div>
@@ -262,6 +327,7 @@
     <script src="src/js/shortcuts.js"></script>
     <script src="src/js/storage.js"></script>
     <script src="src/js/time.js"></script>
+    <script src="src/js/tutorial.js"></script>
     <script src="src/js/version.js"></script>
     <script src="src/js/zen-screenshot.js"></script>
 </body>
