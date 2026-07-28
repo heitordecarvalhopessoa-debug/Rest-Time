@@ -118,8 +118,34 @@ const BrushManager = {
                 this.spawnParticle(x + offsetX, y, sx, sy);
             }
         }
+        else if (this.type === 'web' && !isClick) {
+            for (let i = 0; i < maxParticlesPerFrame; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = (Math.random() * 1.5 + 0.5) * particleSpeedFactor;
+                const sx = Math.cos(angle) * speed;
+                const sy = Math.sin(angle) * speed;
+
+                const offsetX = (Math.random() - 0.5) * this.radius;
+                const offsetY = (Math.random() - 0.5) * this.radius;
+
+                particles.push({
+                    x: x + offsetX,
+                    y: y + offsetY,
+                    size: baseParticleSize * (Math.random() * 0.5 + 0.75),
+                    speedX: sx,
+                    speedY: sy,
+                    alpha: 1,
+                    initialAlpha: 1,
+                    shape: currentShape,
+                    fixedRGB: !isGradientActive ? { ...currentRGB } : null,
+                    isWeb: true
+                });
+            }
+        }
     }
 };
+
+window.BrushManager = BrushManager;
 
 document.addEventListener('DOMContentLoaded', () => {
     BrushManager.init();
