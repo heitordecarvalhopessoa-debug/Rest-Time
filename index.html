@@ -44,8 +44,9 @@
             <button id="eraser-btn" class="control-btn">⌫ ERASER</button>
             <button id="screenshot-btn" class="control-btn">⌕ SNAPSHOT</button>
             <button id="hide-ui-btn" class="control-btn">👁 HIDE UI</button>
+            <button id="leaderboard-btn" class="control-btn">𐃸 LEADERBOARD</button>
+
             <div id="fps-display" class="fps-counter-tag">FPS: 0</div>
-            
             <div class="shortcuts-hint-tag">Press W to see the <b>shortcuts</b></div>
             <div class="shortcuts-hint-tag">Press R to see the <b>tutorial</b></div>
         </div>
@@ -85,7 +86,7 @@
             <audio id="bg-audio" loop></audio>
         </div>
 
-        ''<div id="shortcuts-modal" class="shortcuts-modal hidden">
+        <div id="shortcuts-modal" class="shortcuts-modal hidden">
             <div class="shortcuts-card">
                 <div class="shortcuts-header">
                     <h2>Keyboard Shortcuts</h2>
@@ -146,7 +147,10 @@
             </div>
         </div>
 
-        <div id="version-display" class="version-tag"></div>
+        <div class="version-container">
+            <div id="version-display" class="version-tag"></div>
+            <button id="credits-btn" class="credits-btn">CREDITS</button>
+        </div>
 
         <button id="palette-toggle-btn" class="palette-toggle">
             <span class="toggle-icon"></span>
@@ -210,8 +214,8 @@
                     </div>
                 </div>
 
-                <button id="blackhole-toggle-btn" class="gradient-toggle-btn" title="BlackHole">🕳️</button>
-                <button id="glow-toggle-btn" class="gradient-toggle-btn" title="Glow Effect">✨</button>
+                <button id="blackhole-toggle-btn" class="gradient-toggle-btn" title="BlackHole">❂</button>
+                <button id="glow-toggle-btn" class="gradient-toggle-btn" title="Glow Effect">✷</button>
             </div>
 
             <div class="palette-divider"></div>
@@ -318,10 +322,38 @@
         </div>
     </div>
 
+    <div id="leaderboard-modal" class="modal hidden">
+        <div class="card leaderboard-card">
+            <h1>Leaderboard</h1>
+            <p>Top accounts with the most accumulated time on the site</p>
+
+            <div id="leaderboard-list" class="leaderboard-list-container">
+                </div>
+
+            <div class="modal-buttons" style="margin-top: 15px;">
+                <button id="close-leaderboard-btn" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="credits-modal" class="modal hidden">
+        <div class="card">
+            <h1>Credits</h1>
+            <p>Heitor Pessoa</p> <p style="font-size: 11px; color: #64748b;">Programming and ideas</p>
+            <p>StarDance</p> <p style="font-size: 11px; color: #64748b;">Place to publish devlogs and submit feedback</p>
+
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="close-credits-btn" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="src/js/audiovisualizer.js"></script>
     <script src="src/js/blackhole.js"></script>
     <script src="src/js/brush.js"></script>
+    <script src="src/js/credits.js"></script>
     <script src="src/js/fps.js"></script>
+    <script src="src/js/leaderboard.js"></script>
     <script src="src/js/loading.js"></script>
     <script src="src/js/main.js"></script> 
     <script src="src/js/shortcuts.js"></script>
