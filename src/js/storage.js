@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'rest_time_data';
+const LEADERBOARD_KEY = 'rest_time_leaderboard';
 const LAYOUTS_KEY = 'rest_time_layouts';
 const DB_NAME = 'RestTimeDB';
 const STORE_NAME = 'music_tracks';
@@ -37,33 +38,49 @@ const DataStorage = {
         return data ? JSON.parse(data) : null;
     },
 
-    saveUserData: (data) => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    saveUserData: (userData) => {
+        if (!userData || !userData.name) return;
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+
+        DataStorage.updateLeaderboard(userData);
     },
 
-    loadLayoutsData: () => {
+    clearUserData: () => {
+        localStorage.removeItem(STORAGE_KEY);
+    },
+
+    getAllLeaderboardUsers: () => {
+        const data = localStorage.getItem(LEADERBOARD_KEY);
+        const users = data ? JSON.parse(data) : [];
+        return users.sort((a, b) => (b.totalTimeSpent || 0) - (a.totalTimeSpent || 0));
+    },
+
+    updateLeaderboard: (userData) => {
+        let users = DataStorage.getAllLeaderboardUsers();
+        const index = users.findIndex(u => u.name.toLowerCase() === userData.name.toLowerCase());
+
+        if (index !== -1) {
+            if ((userData.totalTimeSpent || 0) >= (users[index].totalTimeSpent || 0)) {
+                users[index].totalTimeSpent = userData.totalTimeSpent || 0;
+            }
+        } else {
+            users.push({
+                name: userData.name,
+                totalTimeSpent: userData.totalTimeSpent || 0
+            });
+        }
+
+        localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(users));
+    },
+
+    loadLayouts: () => {
         const data = localStorage.getItem(LAYOUTS_KEY);
         return data ? JSON.parse(data) : [];
     },
 
-    saveLayoutsData: (layouts) => {
+    saveLayouts: (layouts) => {
         localStorage.setItem(LAYOUTS_KEY, JSON.stringify(layouts));
-    },
-
-    clearUserData: async () => {
-        localStorage.removeItem(STORAGE_KEY);
-        try {
-            const db = await getDB();
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(STORE_NAME, 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.clear();
-                request.onsuccess = () => resolve();
-                request.onerror = (e) => reject(e.target.error);
-            });
-        } catch (err) {
-            console.error(err);
-        }
     },
 
     loadMusicData: async () => {

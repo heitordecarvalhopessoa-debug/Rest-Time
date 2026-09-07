@@ -33,14 +33,6 @@ const KeyboardShortcuts = {
                 return;
             }
 
-            if (e.key === 'Escape') {
-                if (shortcutsModal && !shortcutsModal.classList.contains('hidden')) {
-                    e.preventDefault();
-                    shortcutsModal.classList.add('hidden');
-                    return;
-                }
-            }
-
             const brushMap = {
                 'Digit1': 'normal', 'Numpad1': 'normal', '1': 'normal',
                 'Digit2': 'random', 'Numpad2': 'random', '2': 'random',
@@ -98,7 +90,7 @@ const KeyboardShortcuts = {
                 }
             }
 
-            if (e.key === 'h' || e.key === 'H') {
+            if (e.key === 'h' || e.key === 'H' || e.key === 'Escape') {
                 e.preventDefault();
                 if (window.ZenScreenshot) window.ZenScreenshot.toggleZenMode();
             }
