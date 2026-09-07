@@ -234,3 +234,68 @@ kbd {
     width: 120px;
     letter-spacing: 0.5px;
 }
+
+.leaderboard-card {
+    max-width: 420px;
+    width: 90%;
+}
+
+.leaderboard-list-container {
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 15px;
+    padding-right: 4px;
+}
+
+.leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0b0f19;
+    border: 1px solid #1e293b;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.leaderboard-row.active-user {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.leaderboard-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rank-number {
+    font-weight: bold;
+    color: #64748b;
+    width: 24px;
+    text-align: left;
+}
+
+.rank-1 { color: #f59e0b; }
+.rank-2 { color: #94a3b8; }
+.rank-3 { color: #b45309; }
+
+.leaderboard-username {
+    color: #3b82f6;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.leaderboard-time {
+    color: #3b82f6;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.no-data {
+    color: #64748e;
+    font-size: 12px;
+    margin-top: 10px;
+}
