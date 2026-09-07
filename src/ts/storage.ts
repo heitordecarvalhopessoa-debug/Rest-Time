@@ -110,5 +110,4 @@ const DataStorage = {
 
 window.DataStorage = DataStorage;
 
-export {}; 
-// hello
+export {};
